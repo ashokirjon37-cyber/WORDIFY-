@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>WORDIFY</title>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0E2238;--mute:#62768A;--line:#E3ECF1;--navy:#0F2F6B;--tq:#0E9AA7;--gold:#F2B73A;--ok:#1FA866;--bad:#E5484D;--vio:#7C3AED;--f:"Onest",system-ui,sans-serif;--fd:"Unbounded","Onest",system-ui,sans-serif;color-scheme:light;box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#fff;color:var(--ink);font:16px/1.5 var(--f);padding-top:env(safe-area-inset-top,0px)}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.055;background-size:84px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'%3E%3Cg fill='none' stroke='%230F2F6B' stroke-width='1.3'%3E%3Crect x='24' y='24' width='36' height='36'/%3E%3Crect x='24' y='24' width='36' height='36' transform='rotate(45 42 42)'/%3E%3Ccircle cx='42' cy='42' r='7'/%3E%3Ccircle cx='0' cy='0' r='7'/%3E%3Ccircle cx='84' cy='0' r='7'/%3E%3Ccircle cx='0' cy='84' r='7'/%3E%3Ccircle cx='84' cy='84' r='7'/%3E%3C/g%3E%3C/svg%3E")}
+main{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:14px 16px calc(104px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{margin:0}
+.hh{font:800 1.6rem/1.2 var(--f);margin:6px 0 12px}.sh{font:700 1.1rem var(--f);margin:20px 0 10px}
+.m{color:var(--mute)}
+/* splash */
+#splash{position:fixed;inset:0;z-index:80;background:#0B1530;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .4s;animation:hide .3s 4s forwards}
+#splash.off{opacity:0;pointer-events:none}#splash svg{width:120px;height:120px;animation:pop .7s cubic-bezier(.2,1.4,.4,1) both}
+#splash b{font:800 1.7rem var(--fd);letter-spacing:.06em;color:#fff}
+.pbar{width:160px;height:5px;border-radius:5px;background:#1E2F5C;overflow:hidden}.pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3CC6D8,#FFD166);animation:fill 1.4s ease-out forwards}
+@keyframes hide{to{opacity:0;visibility:hidden}}@keyframes pop{from{transform:scale(.4);opacity:0}}@keyframes fill{to{width:100%}}@keyframes rin{from{opacity:0;transform:translateY(12px)}}@keyframes rot{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 6px 0 #0A6F79,0 0 0 0 rgba(14,154,167,.5)}50%{box-shadow:0 6px 0 #0A6F79,0 0 0 14px rgba(14,154,167,0)}}
+@keyframes shim{to{background-position:200% 0}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+.spn{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:rot .7s linear infinite;vertical-align:-2px}
+/* generic */
+.bt{display:block;width:100%;max-width:460px;margin:8px auto 0;padding:16px;border-radius:16px;font:700 1.02rem var(--f);background:var(--navy);color:#fff;text-align:center;box-shadow:0 4px 0 #091E45}
+.bt:active{transform:translateY(3px);box-shadow:0 1px 0 #091E45}.bt:disabled{opacity:.4;box-shadow:none}
+.bt.alt{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}.bt.ghost{background:none;color:var(--mute);box-shadow:none}
+.bt.go{background:var(--ok);box-shadow:0 4px 0 #14804B}.bt.rd{background:var(--bad);box-shadow:0 4px 0 #B5373B}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:14px 16px;box-shadow:0 3px 14px rgba(15,47,107,.06)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.chip{padding:8px 15px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:600 .9rem var(--f)}.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.inp,.ta{width:100%;font:inherit;font-size:1.1rem;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}.ta{resize:none}
+.err{color:var(--bad);min-height:1.4em;font-size:.92rem}
+.lb{font:800 .66rem var(--f);padding:2px 7px;border-radius:6px;color:#fff;margin-left:8px;vertical-align:2px}
+.lA1{background:#1FA866}.lA2{background:#0E9AA7}.lB1{background:#2563EB}.lB2{background:#4F46E5}.lC1{background:#9333EA}.lC2{background:#D98E04}
+.pb2{height:8px;border-radius:8px;background:var(--line);overflow:hidden;flex:1}.pb2 i{display:block;height:100%;background:linear-gradient(90deg,var(--tq),var(--gold));border-radius:8px;transition:width .3s}
+.empty{padding:34px 4px;color:var(--mute);text-align:center}
+.ad{height:100px;border:2px dashed #C5D5DC;border-radius:18px;display:flex;align-items:center;justify-content:center;color:#8DA0AC;font:600 .88rem var(--f);background:rgba(245,249,250,.85);margin:20px 0 4px}
+mark{background:#FFE9A8;color:inherit;border-radius:3px;padding:0 1px}
+/* path */
+.gr{display:flex;align-items:center;gap:12px;margin-bottom:12px}.gav{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#14A3B5,#0F2F6B);color:#fff;font:800 1.3rem var(--f);display:flex;align-items:center;justify-content:center;flex:none}
+.gr b{font:800 1.15rem var(--f);display:block}.gr small{color:var(--mute)}.gr>div:nth-child(2){flex:1;min-width:0}
+.chp{padding:6px 11px;border-radius:999px;font:800 .92rem var(--f);background:#FFF1E0;color:#C2610C}.chp.x{background:#E6F4F6;color:#0A6F79;margin-left:6px}
+.goal{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.ring{--p:0;width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--tq) calc(var(--p)*1%),var(--line) 0);display:flex;align-items:center;justify-content:center;flex:none}
+.ring b{width:50px;height:50px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font:800 .82rem var(--f)}
+.mot small{color:#8A5A00;font:700 .74rem var(--f);text-transform:uppercase;letter-spacing:.06em}.mot .me{font:700 1rem/1.3 var(--f)}
+.aipro{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:16px;border-radius:20px;color:#fff;background:linear-gradient(120deg,#0F2F6B,#0E9AA7 55%,#7C3AED);margin:4px 0 6px;box-shadow:0 8px 22px rgba(124,58,237,.25)}
+.aipro span{font-size:1.8rem}.aipro b{font:800 1.05rem var(--fd);display:block;letter-spacing:.02em}.aipro small{opacity:.9}
+.lvh{text-align:center;margin:26px 0 4px;font:700 .85rem var(--f);color:var(--mute)}.lvh b{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--navy);color:#fff;margin-right:6px}
+.nw{text-align:center}.nw small{display:block;color:var(--mute);font-size:.76rem;margin-top:-6px}
+.node{width:70px;height:70px;border-radius:50%;margin:14px 0 10px;font-size:1.6rem;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 0 rgba(0,0,0,.14)}
+.node.done{background:var(--gold);color:#fff;box-shadow:0 6px 0 #C48F12}.node.cur{background:var(--tq);color:#fff;box-shadow:0 6px 0 #0A6F79;animation:pulse 1.6s infinite}.node.lock{background:#E8EEF2;color:#9AAAB8}
+/* lesson overlay */
+#ls{position:fixed;inset:0;z-index:50;background:#fff;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}#ls[hidden]{display:none}
+.lt{display:flex;align-items:center;gap:12px;padding:14px 16px;max-width:640px;width:100%;margin:0 auto}.lt .x{font-size:1.3rem;width:36px;height:36px;color:var(--mute)}.lt span{font:800 .9rem var(--f);color:#C2610C}
+.lb2{flex:1;max-width:640px;width:100%;margin:0 auto;padding:10px 20px;overflow-y:auto}
+.lq{color:var(--mute);font-weight:600;margin-bottom:10px}.lw{font:800 2.2rem/1.15 var(--f);margin-bottom:18px}
+.sp{font-size:1.3rem;width:42px;height:42px;border-radius:12px;background:#E6F4F6;vertical-align:middle}.bigsp{width:110px;height:110px;border-radius:30px;background:linear-gradient(135deg,#0E9AA7,#0F2F6B);color:#fff;font-size:3rem;margin:8px 0 22px;box-shadow:0 6px 0 #091E45}
+.opt{display:block;width:100%;text-align:left;padding:15px 16px;margin:10px 0;border-radius:16px;border:2px solid var(--line);background:#fff;font:600 1.08rem var(--f);box-shadow:0 3px 0 var(--line)}
+.opt.ok{border-color:var(--ok);background:#E8F8EF}.opt.no{border-color:var(--bad);background:#FDECEC}
+.lf{padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));min-height:92px}.lf.gd{background:#E8F8EF}.lf.bd{background:#FDECEC}
+.fbk{max-width:460px;margin:0 auto 6px;font:800 1.05rem var(--f)}.fbk b{display:block;font-size:1.2rem;color:#14804B}.lf.bd .fbk b{color:#B5373B}
+.end{text-align:center;padding-top:30px}.end .done{font-size:5rem;animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}.end h1{font:800 1.8rem var(--f);margin:6px 0 14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.two div{border:2px solid var(--line);border-radius:16px;padding:12px}.two b{display:block;font:800 1.6rem var(--f)}
+/* dictionary */
+.swx{display:flex;align-items:center;gap:10px;margin:12px 0}
+.lp{min-width:92px;padding:8px 14px;border-radius:14px;background:#EEF4F7;text-align:center;line-height:1.15}.lp b{display:block;font:800 1.15rem var(--f);letter-spacing:.05em}.lp small{color:var(--mute);font-size:.72rem}
+.swb{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;font-size:1.3rem}.cnt{margin-left:auto;color:var(--mute);font-size:.9rem}
+ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}li{display:flex;align-items:center;border-bottom:1px solid var(--line);animation:rin .3s both}
+.it{flex:1;text-align:left;padding:13px 4px;min-width:0}.t{font:700 1.15rem var(--f)}.p{font-style:italic;font-size:.82rem;color:var(--mute);margin-left:6px;font-weight:400}
+.ib{width:44px;height:44px;border-radius:12px;font-size:1.2rem}.ib.on{color:#E0245E}
+.aib{display:block;width:100%;text-align:left;padding:13px 15px;margin:0 0 10px;border-radius:14px;background:linear-gradient(90deg,#E6F7FA,#F1ECFF);color:var(--navy);font:700 .95rem var(--f)}
+.aic{border:2px solid #D9CCFA;border-radius:16px;padding:14px;margin:0 0 12px;background:#fff}.uzb{font-size:1.25rem;margin:2px 0 6px}
+/* AI hub */
+.aih{text-align:center;padding:6px 0 14px}.aih h1{font:800 2rem/1.1 var(--fd);background:linear-gradient(90deg,#0E9AA7,#0F2F6B 45%,#7C3AED);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.01em}
+.aih small{display:block;margin-top:6px;color:var(--mute);font-size:.82rem}.aih .sp2{font-size:1.4rem}
+.ams{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px}.ams button{flex:none;padding:9px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:700 .88rem var(--f)}.ams button.on{background:linear-gradient(120deg,#0F2F6B,#7C3AED);border-color:transparent;color:#fff}
+.bb{max-width:88%;padding:10px 14px;border-radius:18px;margin:8px 0;white-space:pre-wrap;animation:rin .25s both;position:relative}
+.bb.u{margin-left:auto;background:var(--navy);color:#fff;border-bottom-right-radius:5px}.bb.a{background:#F1ECFF;border-bottom-left-radius:5px}.bb .sx{font-size:.95rem;margin-left:6px}
+.inrow{display:flex;gap:8px;align-items:center;margin-top:10px}.inrow .inp{flex:1;min-width:0}.mic,.snd{width:48px;height:48px;border-radius:50%;font-size:1.2rem;flex:none}.mic{background:#F1ECFF}.snd{background:linear-gradient(135deg,#0E9AA7,#7C3AED);color:#fff}
+.scn{display:grid;grid-template-columns:1fr 1fr;gap:10px}.scn button{padding:16px 10px;border:1.5px solid var(--line);border-radius:18px;background:#fff;font:700 .95rem var(--f);display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 3px 10px rgba(124,58,237,.07)}.scn span{font-size:1.8rem}
+.res{border:2px solid #D9CCFA;border-radius:18px;padding:14px;margin:12px 0;background:#fff}.res .sc{font:800 2rem var(--f);color:var(--vio)}.res .fx{font:700 1.15rem/1.4 var(--f);margin:6px 0}
+/* stats / profile */
+.st4{display:grid;grid-template-columns:1fr 1fr;gap:10px}.st4 div{border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;background:#fff}.st4 b{display:block;font:800 1.5rem var(--f)}.st4 small{color:var(--mute)}
+.bars{display:flex;gap:8px;align-items:flex-end;height:140px;padding:8px 4px;border:1.5px solid var(--line);border-radius:18px;background:#fff}.bars div{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}.bars i{display:block;width:70%;min-height:4px;border-radius:8px 8px 4px 4px;background:linear-gradient(var(--gold),var(--tq))}.bars small{font-size:.68rem;color:var(--mute)}
+.bd{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bd div{border:1.5px solid var(--line);border-radius:16px;padding:10px 4px;text-align:center;background:#fff}.bd span{font-size:1.7rem}.bd small{display:block;color:var(--mute);font-size:.72rem;line-height:1.2}.bd .off{opacity:.35;filter:grayscale(1)}
+.av{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#14A3B5,#0F2F6B);color:#fff;font:800 2.6rem var(--f);display:flex;align-items:center;justify-content:center;margin:8px auto}
+.un{text-align:center;font:800 1.4rem var(--f)}.ph{text-align:center;color:var(--mute);margin-bottom:14px}
+/* nav */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:flex-end;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+nav[hidden]{display:none}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font:700 .68rem var(--f);color:var(--mute);padding:4px 0}
+nav button span{font-size:1.35rem;line-height:1;padding:3px 14px;border-radius:14px;transition:background .2s}
+nav button[aria-current="true"]{color:var(--navy)}nav button[aria-current="true"] span{background:#E3F4F7}
+nav .ai{margin-top:-28px}nav .ai span{width:64px;height:64px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0E9AA7,#0F2F6B 55%,#7C3AED);color:#fff;font-size:1.7rem;box-shadow:0 8px 22px rgba(124,58,237,.4);border:4px solid #fff}
+nav .ai[aria-current="true"] span{background:linear-gradient(135deg,#0E9AA7,#0F2F6B 55%,#7C3AED)}
+/* sheet + toast + onboarding */
+#sheet{position:fixed;inset:0;z-index:30;background:rgba(5,12,24,.5);display:none;align-items:flex-end}#sheet.on{display:flex}
+.box{background:#fff;width:100%;max-width:640px;margin:0 auto;border-radius:26px 26px 0 0;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));animation:rin .25s ease-out}
+.box .big{font:800 2.1rem var(--f)}.box .uz{font-size:1.5rem;margin:6px 0 14px}.acts{display:flex;gap:8px}.acts button{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--line);font:700 .95rem var(--f)}
+#toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;z-index:90;font:600 .92rem var(--f);opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}#toast.on{opacity:1}
+.cf{position:fixed;left:50%;top:45%;width:8px;height:12px;border-radius:2px;z-index:95;pointer-events:none}
+#ob{position:fixed;inset:0;z-index:60;background:#fff;display:flex;flex-direction:column;overflow-y:auto;padding:24px 22px calc(24px + env(safe-area-inset-bottom,0px));padding-top:calc(24px + env(safe-area-inset-top,0px))}#ob[hidden]{display:none}
+#ob:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.055;background-size:84px;background-image:inherit}
+.obm{flex:1;display:flex;flex-direction:column;max-width:460px;width:100%;margin:0 auto;padding-top:8px;position:relative}.obm.c{justify-content:center}
+.obm svg{width:96px;height:96px;margin-bottom:20px}.obm h1{font:800 2rem/1.15 var(--f);margin:0 0 10px}.obm p{color:var(--mute);margin:0 0 10px}
+.obt{display:flex;align-items:center;gap:12px;max-width:460px;width:100%;margin:0 auto 6px;position:relative}.bk{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);font-size:1.2rem;background:#fff}
+.lvg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.lvb{padding:14px 10px;border:2px solid var(--line);border-radius:16px;text-align:left;background:#fff}.lvb b{display:block;font:800 1.6rem var(--f)}.lvb small{color:var(--mute)}.lvb.on{border-color:var(--navy);background:#F0F5FF}
+.seg{display:flex;background:#EEF4F6;border-radius:14px;padding:4px;margin:6px 0 14px}.seg button{flex:1;padding:10px;border-radius:11px;font:700 .92rem var(--f);color:var(--mute)}.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(15,47,107,.15)}
+.or{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:.85rem;margin:14px 0}.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+.pw{position:relative}.pw .inp{padding-right:52px}.pw button{position:absolute;right:4px;top:4px;width:46px;height:46px;font-size:1.2rem}
+.ck{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;color:var(--mute);font-size:.9rem}.ck input{width:20px;height:20px;margin-top:3px;accent-color:var(--navy)}
+.phr{display:flex;gap:8px}.cc{display:flex;align-items:center;padding:0 14px;border:2px solid var(--line);border-radius:14px;font:800 1rem var(--f);white-space:nowrap;background:#F7FAFB}.phr .inp{flex:1;min-width:0}
+.avg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}.avg button{aspect-ratio:1;border-radius:18px;border:2px solid var(--line);font-size:2rem;background:#fff}.avg button.on{border-color:var(--navy);background:#F0F5FF;transform:scale(1.08)}
+.done{font-size:4.5rem;text-align:center}
+.hero{background:linear-gradient(135deg,#0F2F6B,#0E9AA7);color:#fff;border-radius:26px;padding:16px;margin-bottom:12px;box-shadow:0 10px 26px rgba(15,47,107,.25);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.1)}
+.hero .gr b,.hero .gr small{color:#fff}.hero .gr small{opacity:.85}.hero .gr{position:relative;z-index:1}
+.hero .goal{margin:0;background:rgba(255,255,255,.14);border-radius:18px;padding:10px 12px;position:relative;z-index:1}
+.goal{display:flex;gap:14px;align-items:center}.gt{font:800 1.05rem var(--f)}.gs{opacity:.85;font-size:.88rem}
+.hero .ring{background:conic-gradient(var(--gold) calc(var(--p)*1%),rgba(255,255,255,.25) 0)}
+.wod{display:block;width:100%;text-align:left;background:linear-gradient(135deg,#7C3AED,#0F2F6B);color:#fff;border-radius:22px;padding:16px 18px;margin-bottom:12px;box-shadow:0 8px 22px rgba(124,58,237,.25)}
+.wod small{opacity:.8;font-weight:700}.wt{font:800 1.9rem var(--f)}.wsp{margin-left:6px;font-size:1.3rem;cursor:pointer}.wm2{color:#FFD166;font-size:1.2rem;font-weight:600}
+.mot.card{margin-bottom:12px}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.qa button{padding:14px 10px;border:1.5px solid var(--line);border-radius:18px;background:#fff;font:700 .95rem var(--f);display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 3px 10px rgba(15,47,107,.06)}.qa span{font-size:1.7rem}
+.lvc{margin:0 0 12px}.lvl{margin-bottom:6px}
+.gms{display:grid;gap:12px;margin-top:12px}.gcard{display:flex;align-items:center;gap:14px;text-align:left;width:100%}.gcard span{font-size:2.3rem}.gcard small{display:block;color:var(--mute)}
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.mc{aspect-ratio:1/1.05;border-radius:16px;border:2px solid var(--line);background:#EEF4F7;font:800 1rem var(--f);padding:4px;color:var(--navy);word-break:break-word}.mc.on{background:#fff;border-color:var(--tq)}.mc.dn{background:#E8F8EF;border-color:var(--ok)}
+.tbar{height:8px;border-radius:8px;background:var(--line);overflow:hidden}.tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--tq));transition:width 1s linear}
+.slots{display:flex;gap:6px;justify-content:center;margin:12px 0}.slots span{width:36px;height:46px;border-bottom:3px solid var(--navy);text-align:center;font:800 1.6rem var(--f);text-transform:uppercase}
+.tiles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0}.tile{width:48px;height:52px;border-radius:14px;background:var(--navy);color:#fff;font:800 1.4rem var(--f);text-transform:uppercase;box-shadow:0 4px 0 #091E45}.tile:disabled{opacity:.25}
+.hm{font:800 2rem var(--f);letter-spacing:.25em;text-align:center;margin:12px 0;text-transform:uppercase}
+.kb{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.kb button{width:40px;height:44px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font:800 1rem var(--f);text-transform:uppercase}.kb button:disabled{opacity:.25}
+.gd2{color:var(--ok);font-weight:800;text-align:center}.bd2{color:var(--bad);font-weight:800;text-align:center}
+.pic{display:flex;gap:12px;align-items:center;margin:8px 0 12px}.pic .av{width:72px;height:72px;font-size:2rem;flex:none}
+button.av{position:relative;display:flex;border:0;padding:0}.av,.gav{overflow:hidden}.av img,.gav img{width:100%;height:100%;object-fit:cover}
+.cam{position:absolute;right:2px;bottom:2px;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--ink);font-size:.85rem;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 6px rgba(0,0,0,.25)}
+.nw1{overflow-x:auto;flex-wrap:nowrap}.tt{font:700 1.15rem var(--f)}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD166"/><stop offset="1" stop-color="#F29F05"/></linearGradient>
+<linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#16295E"/><stop offset="1" stop-color="#081329"/></linearGradient>
+<clipPath id="cl"><path d="M190 382L115.5 298.7A100 100 0 1 1 264.5 298.7Z"/></clipPath>
+<symbol id="lg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="url(#bg2)"/>
+<path d="M322 382L247.5 298.7A100 100 0 1 1 396.5 298.7Z" fill="#3CC6D8"/><path d="M190 382L115.5 298.7A100 100 0 1 1 264.5 298.7Z" fill="#fff"/>
+<path d="M322 382L247.5 298.7A100 100 0 1 1 396.5 298.7Z" fill="url(#gd)" clip-path="url(#cl)"/></symbol></defs></svg>
+<div id="splash"><svg><use href="#lg"/></svg><b>WORDIFY</b><div class="pbar"><i></i></div></div>
+<div id="ob" hidden></div>
+<main id="app"></main>
+<nav id="nav" hidden></nav>
+<div id="ls" hidden></div>
+<div id="sheet"><div class="box" id="box"></div></div>
+<div id="toast"></div>
+<input type="file" id="fimg" accept="image/*" hidden>
+<input type="file" id="fdict" accept=".csv,.txt,.json,text/plain,text/csv,application/json" hidden>
+<script>
+const RAW=`hello|salom|i;goodbye|xayr|i;thank you|rahmat|ph;please|iltimos|adv;sorry|kechirasiz|i;welcome|xush kelibsiz|i;yes|ha|adv;no|yoʻq|adv;maybe|balki|adv;
+water|suv|n;bread|non|n;tea|choy|n;coffee|qahva|n;milk|sut|n;meat|goʻsht|n;rice|guruch|n;soup|shoʻrva|n;salt|tuz|n;sugar|shakar|n;egg|tuxum|n;fish|baliq|n;apple|olma|n;melon|qovun|n;grape|uzum|n;fruit|meva|n;vegetable|sabzavot|n;breakfast|nonushta|n;lunch|tushlik|n;dinner|kechki ovqat|n;
+house|uy|n;room|xona|n;door|eshik|n;window|deraza|n;table|stol|n;chair|stul|n;bed|toʻshak|n;kitchen|oshxona|n;city|shahar|n;village|qishloq|n;street|koʻcha|n;road|yoʻl|n;school|maktab|n;hospital|kasalxona|n;shop|doʻkon|n;market|bozor|n;park|bogʻ|n;bridge|koʻprik|n;country|davlat|n;
+family|oila|n;mother|ona|n;father|ota|n;brother|aka, uka|n;sister|opa, singil|n;child|bola|n;man|erkak|n;woman|ayol|n;friend|doʻst|n;teacher|oʻqituvchi|n;student|talaba|n;doctor|shifokor|n;neighbor|qoʻshni|n;guest|mehmon|n;people|odamlar|n;
+time|vaqt|n;day|kun|n;night|tun|n;morning|ertalab|n;evening|kechqurun|n;today|bugun|adv;tomorrow|ertaga|adv;yesterday|kecha|adv;week|hafta|n;month|oy|n;year|yil|n;hour|soat|n;minute|daqiqa|n;now|hozir|adv;always|doim|adv;never|hech qachon|adv;
+sun|quyosh|n;moon|oy|n;star|yulduz|n;sky|osmon|n;mountain|togʻ|n;river|daryo|n;sea|dengiz|n;tree|daraxt|n;flower|gul|n;rain|yomgʻir|n;snow|qor|n;wind|shamol|n;fire|olov|n;earth|yer|n;animal|hayvon|n;bird|qush|n;horse|ot|n;dog|it|n;cat|mushuk|n;
+big|katta|adj;small|kichik|adj;good|yaxshi|adj;bad|yomon|adj;new|yangi|adj;old|eski|adj;beautiful|goʻzal|adj;hot|issiq|adj;cold|sovuq|adj;fast|tez|adj;slow|sekin|adj;happy|xursand|adj;sad|xafa|adj;easy|oson|adj;difficult|qiyin|adj;long|uzun|adj;short|qisqa|adj;tall|baland|adj;strong|kuchli|adj;weak|zaif|adj;clean|toza|adj;dirty|iflos|adj;rich|boy|adj;poor|kambagʻal|adj;young|yosh|adj;heavy|ogʻir|adj;empty|boʻsh|adj;full|toʻla|adj;
+go|bormoq|v;come|kelmoq|v;eat|yemoq|v;drink|ichmoq|v;sleep|uxlamoq|v;read|oʻqimoq|v;write|yozmoq|v;speak|gapirmoq|v;listen|tinglamoq|v;see|koʻrmoq|v;know|bilmoq|v;want|xohlamoq|v;love|sevmoq|v;help|yordam bermoq|v;learn|oʻrganmoq|v;buy|sotib olmoq|v;sell|sotmoq|v;open|ochmoq|v;close|yopmoq|v;wait|kutmoq|v;work|ishlamoq|v;play|oʻynamoq|v;walk|yurmoq|v;run|yugurmoq|v;think|oʻylamoq|v;give|bermoq|v;take|olmoq|v;ask|soʻramoq|v;live|yashamoq|v;understand|tushunmoq|v;forget|unutmoq|v;begin|boshlamoq|v;finish|tugatmoq|v;sit|oʻtirmoq|v;sing|kuylamoq|v;travel|sayohat qilmoq|v;cook|pishirmoq|v;wash|yuvmoq|v;
+money|pul|n;language|til|n;word|soʻz|n;question|savol|n;answer|javob|n;dream|orzu|n;life|hayot|n;peace|tinchlik|n;health|sogʻliq|n;truth|haqiqat|n;idea|gʻoya|n;problem|muammo|n;future|kelajak|n;history|tarix|n;book|kitob|n;pen|qalam|n;phone|telefon|n;computer|kompyuter|n;car|mashina|n;train|poyezd|n;plane|samolyot|n;ticket|chipta|n;name|ism|n;number|raqam|n;
+red|qizil|adj;blue|koʻk|adj;green|yashil|adj;yellow|sariq|adj;white|oq|adj;black|qora|adj;one|bir|num;two|ikki|num;three|uch|num;ten|oʻn|num;hundred|yuz|num;thousand|ming|num`;
+const NEW=`journey|sayohat|n|A2;weather|ob-havo|n|A2;borrow|qarz olmoq|v|A2;invite|taklif qilmoq|v|A2;holiday|taʼtil|n|A2;
+achieve|erishmoq|v|B1;improve|yaxshilamoq|v|B1;experience|tajriba|n|B1;opportunity|imkoniyat|n|B1;decision|qaror|n|B1;environment|atrof-muhit|n|B1;society|jamiyat|n|B1;advice|maslahat|n|B1;
+ambiguous|noaniq|adj|B2;consequence|oqibat|n|B2;contribute|hissa qoʻshmoq|v|B2;reliable|ishonchli|adj|B2;efficient|samarali|adj|B2;sustainable|barqaror|adj|B2;negotiate|muzokara qilmoq|v|B2;perspective|nuqtai nazar|n|B2;
+meticulous|puxta, sinchkov|adj|C1;reluctant|istamaydigan|adj|C1;inevitable|muqarrar|adj|C1;scrutinize|sinchiklab tekshirmoq|v|C1;profound|chuqur|adj|C1;resilient|bardoshli|adj|C1;elaborate|batafsil bayon qilmoq|v|C1;pragmatic|amaliy|adj|C1;
+ephemeral|oʻtkinchi|adj|C2;ubiquitous|hamma joyda uchraydigan|adj|C2;serendipity|baxtli tasodif|n|C2;quintessential|eng tipik|adj|C2;obfuscate|chalkashtirmoq|v|C2;idiosyncrasy|oʻziga xos xususiyat|n|C2;magnanimous|saxovatli|adj|C2;eloquent|ravon, notiq|adj|C2`;
+const MORE=`airport|aeroport|n|A2;luggage|yuk|n|A2;passport|pasport|n|A2;delicious|mazali|adj|A2;dangerous|xavfli|adj|A2;kind|mehribon|adj|A2;busy|band|adj|A2;excited|hayajonlangan|adj|A2;message|xabar|n|A2;password|parol|n|A2;
+customer|mijoz|n|B1;salary|maosh|n|B1;career|kasb yoʻli|n|B1;knowledge|bilim|n|B1;relationship|munosabat|n|B1;popular|mashhur|adj|B1;successful|muvaffaqiyatli|adj|B1;patient|sabrli|adj|B1;polite|xushmuomala|adj|B1;probably|ehtimol|adv|B1;actually|aslida|adv|B1;remind|eslatmoq|v|B1;suggest|taklif qilmoq|v|B1;prefer|afzal koʻrmoq|v|B1;refuse|rad etmoq|v|B1;recommend|tavsiya qilmoq|v|B1;manage|uddalamoq|v|B1;avoid|qochmoq|v|B1;discuss|muhokama qilmoq|v|B1;support|qoʻllab-quvvatlamoq|v|B1;develop|rivojlantirmoq|v|B1;compare|solishtirmoq|v|B1;require|talab qilmoq|v|B1;
+evidence|dalil|n|B2;consider|hisobga olmoq|v|B2;approach|yondashuv|n|B2;challenge|qiyin vazifa|n|B2;achievement|yutuq|n|B2;behavior|xulq|n|B2;benefit|foyda|n|B2;significant|muhim|adj|B2;ordinary|oddiy|adj|B2;flexible|moslashuvchan|adj|B2;accurate|aniq|adj|B2;obvious|ravshan|adj|B2;reputation|obroʻ|n|B2;estimate|baholamoq|v|B2;imply|anglatmoq|v|B2;establish|tashkil etmoq|v|B2;emphasize|taʼkidlamoq|v|B2;maintain|saqlab qolmoq|v|B2;eliminate|bartaraf etmoq|v|B2;nevertheless|shunga qaramay|adv|B2;
+inherent|ajralmas|adj|C1;subtle|nozik|adj|C1;compelling|ishonarli|adj|C1;ambiguity|noaniqlik|n|C1;coherent|izchil|adj|C1;deteriorate|yomonlashmoq|v|C1;mitigate|yumshatmoq|v|C1;advocate|himoya qilmoq|v|C1;undermine|zaiflashtirmoq|v|C1;bureaucracy|byurokratiya|n|C1;plausible|ehtimolli|adj|C1;substantial|sezilarli|adj|C1;scrutiny|sinchkov tekshiruv|n|C1;leverage|ustunlik qilmoq|v|C1;discrepancy|nomuvofiqlik|n|C1;formidable|kuchli, dahshatli|adj|C1;
+ameliorate|yaxshilamoq|v|C2;perfunctory|yuzaki|adj|C2;ostensible|zohiriy|adj|C2;capricious|oʻzgaruvchan|adj|C2;juxtapose|yonma-yon qoʻymoq|v|C2;proclivity|moyillik|n|C2;recalcitrant|aytganga koʻnmaydigan|adj|C2;pernicious|zararli|adj|C2;vicarious|bilvosita|adj|C2;equivocal|ikki maʼnoli|adj|C2;abstruse|tushunish qiyin|adj|C2;sagacious|oqil|adj|C2;zealous|gʻayratli|adj|C2;tenacious|qatʼiyatli|adj|C2;gregarious|jamiyatparvar|adj|C2`;
+const POS={n:"ot",v:"fe’l",adj:"sifat",adv:"ravish",i:"undov",ph:"ibora",num:"son"};
+const LVS=["A1","A2","B1","B2","C1","C2"];
+const LVN={A1:"Boshlangʻich",A2:"Elementar",B1:"Oʻrta",B2:"Oʻrta-yuqori",C1:"Ilgʻor",C2:"Mukammal"};
+const LV0=["A1","A1","A1","A1","A1","A2","A2","A2","B1","A1"];
+const MOT=[["Every day is a new page.","Har kun — yangi sahifa."],["Small steps, big results.","Kichik qadamlar, katta natija."],["Practice makes progress.","Mashq taraqqiyot beradi."],["Mistakes show you are trying.","Xatolar urinayotganingizni koʻrsatadi."],["One word a day changes a lot.","Kuniga bir soʻz juda koʻp narsani oʻzgartiradi."],["Start where you are.","Turgan joyingizdan boshlang."],["Learning never stops.","Oʻrganish hech qachon toʻxtamaydi."]];
+const SCN=[["🍽️","Restoranda","a waiter in a restaurant"],["✈️","Aeroportda","an airport check-in officer"],["💼","Ish suhbati","a job interviewer"],["🏥","Shifokorda","a doctor"],["🏨","Mehmonxonada","a hotel receptionist"],["🛍️","Doʻkonda","a shop assistant"]];
+const TOP=["Oziq-ovqat","Sayohat","Ish va biznes","Texnologiya","Tibbiyot","Taʼlim","Sport","Tabiat"];
+const AVS=["🦊","🐼","🦁","🐯","🐸","🐧","🦉","🐙"];
+const PUR=["💼 Ish","🎓 Oʻqish","✈️ Sayohat","📝 Imtihon","🎬 Qiziqish","🌍 Doʻstlar"];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>String(s).toLowerCase().replace(/[ʻʼ’'`‘]/g,"");
+const LS=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
+const SV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const ymd=o=>new Date(Date.now()-o*864e5).toISOString().slice(0,10);
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const rnd=a=>a[Math.random()*a.length|0];
+let LANG=LS("w3lang","uz");
+const EN={};const ENSRC=`Xayrli tun=Good night
+Xayrli tong=Good morning
+Xayrli kun=Good afternoon
+Xayrli kech=Good evening
+Yuklanmoqda…=Loading…
+ta soʻz qoʻshildi ✓=words added ✓
+Yangi soʻz topilmadi=No new words found
+AI uchun ruxsat berilmadi.=Permission for AI was not granted.
+Biroz kuting va qayta urinib koʻring.=Please wait a moment and try again.
+AI hozir mavjud emas. Keyinroq urinib koʻring.=AI is not available right now. Try again later.
+Bu soʻz nima?=What does this word mean?
+Tinglash=Listen
+Eshiting va tarjimasini tanlang=Listen and choose the translation
+Inglizchasi qaysi?=Which is the English word?
+Inglizcha yozing=Type it in English
+Javobingiz…=Your answer…
+Chiqish=Exit
+Tekshirish=Check
+✅ Toʻgʻri!=✅ Correct!
+❌ Toʻgʻri javob:=❌ Correct answer:
+Davom etish=Continue
+Mashq tugadi!=Practice complete!
+Tabriklaymiz!=Congratulations!
+Siz eng yuqori darajadasiz!=You are at the top level!
+Yana urinib koʻring=Try again
+Oʻtish uchun kamida 80% kerak.=You need at least 80% to pass.
+Qayta urinish=Retry
+Yopish=Close
+aniqlik=accuracy
+Vaqt tugadi!=Time is up!
+toʻgʻri=correct
+rekord=record
+Qayta oʻynash=Play again
+Ajoyib!=Great job!
+Xotira=Memory
+Yurishlar=Moves
+Inglizcha va oʻzbekcha juftliklarni toping=Match the English and Uzbek pairs
+Tez javob=Speed quiz
+Ball=Score
+Harflar=Letters
+Harflardan soʻzni tuzing=Build the word from the letters
+Oʻchirish=Delete
+Soʻzni toping=Guess the word
+Maʼnosi=Meaning
+Keyingisi=Next
+Notoʻgʻri, qayta urining=Wrong, try again
+Bugungi maqsad=Today's goal
+jami=total
+Kun soʻzi=Word of the day
+Kun motivatsiyasi=Daily motivation
+Mashq qilish=Practice
+Mashq=Practice
+Eshitib topish=Listening
+Oʻyinlar=Games
+Tarjimon=Translator
+Keyingi darajaga oʻtish=Move up to the next level
+10 ta savolning kamida 8 tasiga toʻgʻri javob bering.=Answer at least 8 out of 10 questions correctly.
+Daraja imtihoni=Level exam
+Oxirgi natija=Last result
+Yaqinda koʻrilgan=Recently viewed
+Reklama uchun joy=Ad space
+Yoqtirish=Like
+Lugʻat=Dictionary
+Qidirish=Search
+Yoʻnalishni almashtirish=Swap direction
+AI bilan lugʻatni kengaytirish=Expand the dictionary with AI
+Mavzuni tanlang: AI 25 ta yangi soʻz qoʻshadi=Pick a topic: AI adds 25 new words
+Inglizcha soʻz yozing…=Type an English word…
+Oʻzbekcha soʻz yozing…=Type an Uzbek word…
+Hammasi=All
+Sevimli=Favorites
+ta=results
+ni WORDIFY AI dan soʻrash=ask WORDIFY AI
+AI qidiryapti…=AI is searching…
+Lugʻatga qoʻshish=Add to dictionary
+Yana koʻrsatish=Show more
+Hali sevimli soʻz yoʻq.=No favorite words yet.
+Lugʻatda topilmadi.=Not found in the dictionary.
+AI soʻz tayyorlayapti…=AI is preparing words…
+ta yangi soʻz qoʻshildi=new words added
+bilan ingliz tili yanada oson=makes English easier
+Suhbat=Chat
+Rolli oʻyin=Role-play
+Tarjima=Translate
+Ovoz bilan=Voice
+Savolingizni yozing…=Type your question…
+Yuborish=Send
+Soʻz maʼnosi, grammatika yoki misol haqida soʻrang.=Ask about word meanings, grammar or examples.
+Boshqa=Other
+Vaziyatni tanlang. AI roli oʻynaydi, siz inglizcha javob berasiz.=Pick a situation. AI plays the role and you answer in English.
+Inglizcha gap yozing, AI xatolarini tushuntiradi.=Write an English sentence and AI will explain your mistakes.
+Gap yoki matn yozing…=Write a sentence or text…
+Tarjima qilish=Translate
+Tekshirilmoqda…=Checking…
+Toʻgʻri variant:=Correct version:
+Tarjima qilinmoqda…=Translating…
+Nusxa=Copy
+Bu brauzerda ovoz kiritish yoʻq=Voice input is not available in this browser
+Ovoz eshitilmadi=Could not hear you
+Gapiring…=Speak…
+Zerikkanda oʻynang va soʻz oʻrganing!=Play when you're bored and learn words!
+Rekord=Record
+Rasm tanlash=Choose photo
+Kunlik seriya=Day streak
+Lugʻatda soʻz=Words in dictionary
+Sevimli soʻz=Favorite words
+Mening darajam=My level
+Til=Language
+Kunlik maqsad=Daily goal
+Haftalik XP=Weekly XP
+Yutuqlar=Achievements
+Lugʻatni import qilish=Import dictionary
+CSV, TXT yoki JSON fayl: har qatorda inglizcha, oʻzbekcha, turkum, daraja.=CSV, TXT or JSON file: English, Uzbek, part of speech, level on each line.
+Fayldan yuklash=Upload from file
+Qoʻshilgan soʻzlarni oʻchirish=Delete added words
+Profilni tahrirlash=Edit profile
+Doʻstga ulashish=Share with a friend
+Natijalarni tozalash=Reset progress
+Assalomu alaykum!=Hello!
+WORDIFY ga xush kelibsiz — ingliz tilini oʻzbek tilida, oson va qiziqarli oʻrganing. Mashqlar, oʻyinlar, lugʻat va WORDIFY AI repetitor bir joyda.=Welcome to WORDIFY — learn English easily and with fun. Practice, games, a dictionary and the WORDIFY AI tutor in one place.
+Nima uchun oʻrganyapsiz?=Why are you learning?
+Bir nechtasini tanlashingiz mumkin.=You can choose several.
+Inglizcha darajangiz?=What is your English level?
+Bilmasangiz, A1 ni tanlang. Keyin imtihon bilan yuqoriga chiqasiz.=If you are not sure, choose A1. Then move up with exams.
+Roʻyxatdan oʻting=Sign up
+Hisobingizga kiring=Log in to your account
+Roʻyxatdan oʻtish=Sign up
+Kirish=Log in
+Google bilan davom etish=Continue with Google
+Apple bilan davom etish=Continue with Apple
+yoki email bilan=or with email
+Ismingiz=Your name
+Email manzil=Email address
+Parol (kamida 6 ta belgi)=Password (at least 6 characters)
+Parolni koʻrsatish=Show password
+Foydalanish shartlari va maxfiylik siyosatiga roziman=I agree to the terms of use and privacy policy
+Telefon raqamingiz=Your phone number
+Telefon raqamingizni kiriting. U sizning hisobingiz bilan bogʻlanadi.=Enter your phone number. It will be linked to your account.
+Profilingiz=Your profile
+Rasm tanlang yoki avatar qoʻying, foydalanuvchi nomini kiriting (lotin harflari, raqam, _).=Choose a photo or avatar and enter a username (letters, digits, _).
+Galereyadan tanlash=Choose from gallery
+masalan=e.g.
+Saqlash=Save
+Bekor qilish=Cancel
+Tayyor=All set
+Daraja=Level
+Maqsad=Goal
+Birinchi mashqingiz sizni kutyapti.=Your first practice is waiting for you.
+WORDIFY ni boshlash=Start WORDIFY
+Orqaga=Back
+Ismingizni yozing=Enter your name
+Email manzilni toʻgʻri yozing=Enter a valid email address
+Parol kamida 6 ta belgidan iborat boʻlsin=Password must be at least 6 characters
+Davom etish uchun shartlarga rozilik bering=Accept the terms to continue
+Email yoki parol notoʻgʻri=Email or password is incorrect
+Bu qurilmada hisob topilmadi. Roʻyxatdan oʻting.=No account found on this device. Please sign up.
+3–20 ta belgi: harf, raqam yoki _=3–20 characters: letters, digits or _
+Rasm qoʻyildi ✓=Photo set ✓
+Rasm ochilmadi=Could not open the photo
+Ulanmoqda…=Connecting…
+Raqam 9 ta raqamdan iborat boʻlsin (masalan, 90 123 45 67)=The number must have 9 digits (e.g. 90 123 45 67)
+Lugʻatga qoʻshildi ✓=Added to dictionary ✓
+Nusxa olindi=Copied
+Nusxa olib boʻlmadi=Could not copy
+Ingliz tilini WORDIFY bilan oʻrganing!=Learn English with WORDIFY!
+Havola nusxalandi=Link copied
+Tozalandi=Cleared
+Home=Home
+AI=AI
+Profil=Profile
+Inglizcha=English
+Oʻzbekcha=Uzbek
+ot=noun
+fe’l=verb
+sifat=adjective
+ravish=adverb
+undov=interjection
+ibora=phrase
+son=number
+Boshlangʻich=Beginner
+Elementar=Elementary
+Oʻrta=Intermediate
+Oʻrta-yuqori=Upper-intermediate
+Ilgʻor=Advanced
+Mukammal=Proficient
+💼 Ish=💼 Work
+🎓 Oʻqish=🎓 Study
+✈️ Sayohat=✈️ Travel
+📝 Imtihon=📝 Exams
+🎬 Qiziqish=🎬 Hobby
+🌍 Doʻstlar=🌍 Friends
+Oziq-ovqat=Food
+Sayohat=Travel
+Ish va biznes=Work & business
+Texnologiya=Technology
+Tibbiyot=Medicine
+Taʼlim=Education
+Sport=Sports
+Tabiat=Nature
+Restoranda=At a restaurant
+Aeroportda=At the airport
+Ish suhbati=Job interview
+Shifokorda=At the doctor
+Mehmonxonada=At the hotel
+Doʻkonda=At the shop
+Yengil · 20 XP=Easy · 20 XP
+Oʻrta · 40 XP=Medium · 40 XP
+Qattiq · 60 XP=Hard · 60 XP
+3 kunlik seriya=3-day streak
+7 kunlik seriya=7-day streak
+A2 darajaga chiqdi=Reached A2
+B1 darajaga chiqdi=Reached B1
+Lugʻat kengaytirildi=Dictionary expanded
+“ambiguous” nima degani?=What does “ambiguous” mean?
+Present Perfect ni oddiy tushuntir=Explain Present Perfect simply
+Menga 5 ta soʻz va gap ber=Give me 5 words and sentences
+Ish suhbati uchun 3 ta ibora=3 phrases for a job interview
+Juftliklarni toping=Find the pairs
+60 soniyada koʻproq javob=Answer as many as you can in 60 seconds
+Aralash harflardan soʻz tuzing=Unscramble the letters
+Harflarni taxmin qiling=Guess the letters`;ENSRC.split("\n").forEach(l=>{const i=l.indexOf("=");if(i>0)EN[l.slice(0,i)]=l.slice(i+1)});
+const t=s=>LANG==="en"&&EN[s]||s;
+let U=LS("w3u",null),NM=LS("w3n",""),AV=LS("w3a",""),AVI=LS("w3img",""),PH=LS("w3ph",""),L=LS("w3l",null),GL=LS("w3g",40),PU=LS("w3pu",[]);
+let fav=new Set(LS("w3f",[])),rec=LS("w3r",[]),X=LS("w3xp",{t:0,d:{}}),ST=LS("w3s",{d:"",n:0}),EX=LS("w3ex",null),BEST=LS("w3best",0);
+let D=[],DU=null,PL={},EXTRA=[],SEEN=new Set(),S={v:"home",dir:"en",q:"",lv:"all",lim:100,gen:false,am:"chat",msgs:{chat:[],role:[]},scn:null,td:"en",aw:null,tres:"",ls:null,g:null};
+const LI=l=>LVS.indexOf(l);
+const streak=()=>ST.d===ymd(0)||ST.d===ymd(1)?ST.n:0,tx=()=>X.d[ymd(0)]||0;
+const greet=()=>{const h=new Date().getHours();return t(h<5?"Xayrli tun":h<12?"Xayrli tong":h<18?"Xayrli kun":"Xayrli kech")};
+const speak=x=>{try{const u=new SpeechSynthesisUtterance(x);u.lang="en-US";speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}};
+const toast=x=>{const e=$("#toast");e.textContent=x;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),2300)};
+const anim=(el,k,o)=>{try{el&&el.animate(k,o)}catch(e){}};
+const avc=()=>AVI?`<img src="${AVI}" alt="">`:esc(AV||((NM||U||OB.name||"?")[0]||"?").toUpperCase());
+function addXP(n){const d=ymd(0);X.t+=n;X.d[d]=(X.d[d]||0)+n;SV("w3xp",X);if(ST.d!==d){ST={d,n:ST.d===ymd(1)?ST.n+1:1};SV("w3s",ST)}}
+function boom(){const c=["#FFD166","#3CC6D8","#0F2F6B","#E0245E","#1FA866","#7C3AED"];
+ for(let i=0;i<30;i++){const e=document.createElement("i");e.className="cf";e.style.background=c[i%6];document.body.appendChild(e);const a=Math.random()*6.28,d=80+Math.random()*150;
+  try{e.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+70}px) rotate(${Math.random()*540}deg) scale(.4)`,opacity:0}],{duration:900,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>e.remove()}catch(x){e.remove()}}
+ try{navigator.vibrate(25)}catch(x){}}
+
+/* ---------- dictionary data (built-in + imported + AI-added) ---------- */
+function mk(en,uz,p,l,x,xu){en=String(en||"").trim();uz=String(uz||"").trim();if(!en||!uz)return null;const id=norm(en)+"|"+norm(uz);if(SEEN.has(id))return null;SEEN.add(id);
+ return {en,uz,p:POS[p]?p:"n",l:LVS.includes(l)?l:"B1",x:x||"",xu:xu||"",k1:norm(en),k2:norm(uz)}}
+function rebuild(){D.sort((a,b)=>a.k1<b.k1?-1:a.k1>b.k1?1:0);DU=null;PL={};LVS.forEach(l=>PL[l]=[]);D.forEach(w=>PL[w.l].push(w))}
+const dsort=()=>S.dir==="en"?D:(DU||(DU=D.slice().sort((a,b)=>a.k2<b.k2?-1:a.k2>b.k2?1:0)));
+const pool=l=>{const p=PL[l||L]||[];return p.length>=10?p:D};
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open("wordify3",1);r.onupgradeneeded=()=>r.result.createObjectStore("k");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function idbGet(k){try{const db=await idb();return await new Promise(res=>{const q=db.transaction("k").objectStore("k").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})}catch(e){return null}}
+async function idbSet(k,v){try{const db=await idb();return await new Promise(res=>{const tx=db.transaction("k","readwrite");tx.objectStore("k").put(v,k);tx.oncomplete=()=>res(true);tx.onerror=()=>res(false)})}catch(e){return false}}
+async function addMany(rows){let n=0;for(const r of rows){const w=mk(r[0],r[1],r[2],r[3],r[4],r[5]);if(w){D.push(w);EXTRA.push([w.en,w.uz,w.p,w.l,w.x,w.xu]);n++}}
+ if(n){rebuild();await idbSet("extra",EXTRA)}return n}
+function parseWords(txt){txt=txt.replace(/^\uFEFF/,"").trim();if(!txt)return[];
+ if(txt[0]==="["){try{return JSON.parse(txt).map(o=>Array.isArray(o)?o:[o.en,o.uz,o.pos||o.p,o.level||o.l,o.ex||o.x,o.exUz||o.xu])}catch(e){return[]}}
+ const lines=txt.split(/\r?\n/),f=lines[0],dl=["\t","|",";",","].find(c=>f.includes(c))||",";
+ let rows=lines.map(l=>l.split(dl).map(s=>s.trim().replace(/^"|"$/g,"")));
+ if(rows[0]&&/^(en|english)$/i.test(rows[0][0]))rows.shift();return rows.filter(r=>r.length>=2)}
+async function importFile(f){if(!f)return;toast(t("Yuklanmoqda…"));const txt=await f.text(),n=await addMany(parseWords(txt));toast(n?`${n} ${t("ta soʻz qoʻshildi ✓")}`:t("Yangi soʻz topilmadi"));render()}
+
+/* ---------- AI (works inside claude.ai; elsewhere a server is needed) ---------- */
+let SM=null;
+async function sm(){if(SM)return SM;try{SM=await window.claude.use("sample")}catch(e){}return SM}
+async function ask(p,json){const s=await sm();if(!s)throw{code:"na"};return json?await s.json(p):(await s(p,{cache:false})).text}
+const aiErr=e=>t(e&&e.code==="not_granted"?"AI uchun ruxsat berilmadi.":e&&e.code==="rate_limited"?"Biroz kuting va qayta urinib koʻring.":"AI hozir mavjud emas. Keyinroq urinib koʻring.");
+const AIS=()=>`You are WORDIFY AI, a friendly English tutor for Uzbek speakers (learner level ${L||"A1"}). ${LANG==="en"?"Reply in simple English suitable for the level.":"Reply in Uzbek (Latin script) with short English examples."} Be concise (max ~110 words).`;
+const ROLE=r=>`You are ${r} in a role-play with an English learner (level ${L||"A1"}). Speak only English, 1–2 short sentences, then ask a question to continue. If the learner made a grammar mistake, add a last line starting with "Maslahat:" with a very short tip in ${LANG==="en"?"English":"Uzbek"}.`;
+
+/* ---------- practice / exam / games overlay ---------- */
+function opts(w,k){const o=new Set([w[k]]),pl=D.filter((x,i)=>i%7===0&&x.p===w.p&&x[k]!==w[k]),src=pl.length>=3?pl:D;let g=0;while(o.size<4&&g++<300)o.add(rnd(src)[k]);return shuf([...o])}
+function sess(kind,words,types){const ws=shuf(words).slice(0,10);S.ls={kind,qs:ws.map((w,i)=>({w,t:types?types[i%types.length]:i%4})),i:0,ok:0,xp:0};S.g=null;$("#ls").hidden=false;showQ()}
+function showQ(){const z=S.ls,q=z.qs[z.i];if(!q)return endSess();const w=q.w,tt=q.t;
+ const pr=tt===0?`<div class="lq">${t("Bu soʻz nima?")}</div><div class="lw">${esc(w.en)} <button class="sp" data-s="${esc(w.en)}" aria-label="${t("Tinglash")}">🔊</button></div>`
+  :tt===1?`<div class="lq">${t("Eshiting va tarjimasini tanlang")}</div><button class="bigsp" data-s="${esc(w.en)}" aria-label="${t("Tinglash")}">🔊</button>`
+  :tt===2?`<div class="lq">${t("Inglizchasi qaysi?")}</div><div class="lw">${esc(w.uz)}</div>`:`<div class="lq">${t("Inglizcha yozing")}</div><div class="lw">${esc(w.uz)}</div>`;
+ const op=tt===3?`<input class="inp" id="lin" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="${t("Javobingiz…")}">`:opts(w,tt===2?"en":"uz").map(o=>`<button class="opt" data-lo="${esc(o)}">${esc(o)}</button>`).join("");
+ $("#ls").innerHTML=`<div class="lt"><button class="x" id="lx" aria-label="${t("Chiqish")}">✕</button><div class="pb2"><i style="width:${z.i/z.qs.length*100}%"></i></div><span>⚡ ${z.xp}</span></div><div class="lb2">${pr}<div>${op}</div></div><div class="lf" id="lf">${tt===3?`<button class="bt go" id="lck">${t("Tekshirish")}</button>`:""}</div>`;
+ if(tt===1)setTimeout(()=>speak(w.en),250);if(tt===3)setTimeout(()=>{const i=$("#lin");i&&i.focus()},120)}
+function judge(ok,ans){const z=S.ls,q=z.qs[z.i],w=q.w;
+ if(ok){z.ok++;z.xp+=2}else if(!q.r&&z.kind==="practice"){q.r=1;z.qs.push({w,t:(q.t+1)%4,r:1})}
+ document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;const v=b.dataset.lo;if(v===(q.t===2?w.en:w.uz))b.classList.add("ok");else if(v===ans)b.classList.add("no")});
+ const lf=$("#lf");lf.className="lf "+(ok?"gd":"bd");
+ lf.innerHTML=`<div class="fbk">${ok?t("✅ Toʻgʻri!"):t("❌ Toʻgʻri javob:")}${ok?"":`<b>${esc(q.t>=2?w.en:w.uz)}</b>`}</div><button class="bt ${ok?"go":"rd"}" id="lnx">${t("Davom etish")}</button>`;
+ try{navigator.vibrate(ok?12:[20,40,20])}catch(e){}}
+function endSess(){const z=S.ls,tot=z.qs.length,acc=Math.round(z.ok/tot*100);let head="🏆",title=t("Mashq tugadi!"),extra="",gain=z.xp+5,btn=`<button class="bt" id="lfin">${t("Davom etish")}</button>`;
+ if(z.kind==="exam"){const pass=acc>=80&&LI(L)<5;
+  if(pass){const old=L;L=LVS[LI(L)+1];SV("w3l",L);z.up=1;gain=z.xp+20;title=t("Tabriklaymiz!");extra=`<p class="m">${old} → <b>${L}</b> · ${t(LVN[L])}</p>`}
+  else if(LI(L)===5){title=t("Siz eng yuqori darajadasiz!");head="👑"}
+  else{head="💪";title=t("Yana urinib koʻring");extra=`<p class="m">${t("Oʻtish uchun kamida 80% kerak.")}</p>`;btn=`<button class="bt" id="again">${t("Qayta urinish")}</button><button class="bt ghost" id="lfin">${t("Yopish")}</button>`}}
+ addXP(gain);boom();
+ $("#ls").innerHTML=`<div class="lb2"><div class="end"><div class="done">${head}</div><h1>${title}</h1><div class="two"><div><b>⚡ ${gain}</b>XP</div><div><b>🎯 ${acc}%</b>${t("aniqlik")}</div></div>${extra}</div></div><div class="lf">${btn}</div>`}
+function closeOv(){clearInterval(S.gi);$("#ls").hidden=true;S.ls=null;S.g=null}
+function askLang(){$("#box").innerHTML=`<div class="big" style="font-size:1.5rem">🇬🇧 ${LVS[Math.max(2,LI(L))]}+</div><p>Siz yuqori darajadasiz. Ilovani toʻliq inglizcha qilaymi?<br><span class="m">You are at a higher level. Do you want the whole app in English?</span></p><div class="acts"><button data-lg="en">English</button><button data-lg="uz">Oʻzbekcha</button></div>`;$("#sheet").classList.add("on")}
+function setLang(l){LANG=l;SV("w3lang",l);$("#sheet").classList.remove("on");buildNav();ob.cur!==undefined&&!$("#ob").hidden?ob(ob.cur):render()}
+function buildNav(){$("#nav").innerHTML=[["home","🏠","Home"],["dict","📖","Lugʻat"],["ai","✨","AI","ai"],["games","🎮","Oʻyinlar"],["me","👤","Profil"]].map(a=>`<button data-v="${a[0]}" class="${a[3]||""}"><span>${a[1]}</span>${t(a[2])}</button>`).join("")}
+
+/* games */
+const hdr=(title,sc)=>`<div class="lt"><button class="x" id="gx" aria-label="${t("Chiqish")}">✕</button><b style="flex:1">${title}</b><span>${sc}</span></div>`;
+const single=l=>/^[a-z]{3,10}$/.test(l);
+function gStart(k){const p=pool().filter(w=>single(w.en)),all=D.filter(w=>single(w.en));S.ls=null;$("#ls").hidden=false;
+ if(k==="mem"){const ws=shuf(p).slice(0,6),cs=[];ws.forEach((w,i)=>{cs.push({p:i,x:w.en});cs.push({p:i,x:w.uz})});S.g={k,cs:shuf(cs).map(c=>({...c,o:0,d:0})),sel:[],mv:0,left:6}}
+ if(k==="spd"){S.g={k,sc:0,tl:60,q:null};nextSpd();clearInterval(S.gi);S.gi=setInterval(()=>{if(!S.g||S.g.k!=="spd"){clearInterval(S.gi);return}S.g.tl--;if(S.g.tl<=0){clearInterval(S.gi);spdEnd()}else{const e=$("#tl");e&&(e.style.width=S.g.tl/60*100+"%");const s=$("#tn");s&&(s.textContent="⏱ "+S.g.tl)}},1000)}
+ if(k==="scr"){S.g={k,ws:shuf(p).slice(0,8),i:0,sc:0};scrNext()}
+ if(k==="hang"){S.g={k,sc:0};hangNext()}
+ gRender()}
+function nextSpd(){const w=rnd(pool());S.g.q={w,o:opts(w,"uz")}}
+function spdEnd(){const g=S.g,n=g.sc;if(n>BEST){BEST=n;SV("w3best",n)}addXP(Math.min(n,25));boom();$("#ls").innerHTML=`<div class="lb2"><div class="end"><div class="done">⚡</div><h1>${t("Vaqt tugadi!")}</h1><div class="two"><div><b>${n}</b>${t("toʻgʻri")}</div><div><b>🏅 ${BEST}</b>${t("rekord")}</div></div></div></div><div class="lf"><button class="bt" id="gagain" data-gm="spd">${t("Qayta oʻynash")}</button><button class="bt ghost" id="gx">${t("Yopish")}</button></div>`}
+function scrNext(){const g=S.g,w=g.ws[g.i];if(!w){addXP(g.sc*2);boom();$("#ls").innerHTML=`<div class="lb2"><div class="end"><div class="done">🔤</div><h1>${t("Ajoyib!")}</h1><div class="two"><div><b>${g.sc}/${g.ws.length}</b>${t("toʻgʻri")}</div><div><b>⚡ ${g.sc*2}</b>XP</div></div></div></div><div class="lf"><button class="bt" data-gm="scr">${t("Qayta oʻynash")}</button><button class="bt ghost" id="gx">${t("Yopish")}</button></div>`;g.end=1;return}
+ let a=w.en.split("");let g2=0;do{a=shuf(a)}while(a.join("")===w.en&&g2++<9);g.w=w;g.tiles=a;g.pk=[]}
+function hangNext(){const w=rnd(pool().filter(x=>/^[a-z]{4,9}$/.test(x.en))),g=S.g;g.w=w;g.gs=new Set();g.lv=6;g.st=0}
+function gRender(){const g=S.g;if(!g||g.end)return;const el=$("#ls");
+ if(g.k==="mem"){el.innerHTML=hdr("🧠 "+t("Xotira"),`${t("Yurishlar")}: ${g.mv}`)+`<div class="lb2"><p class="m">${t("Inglizcha va oʻzbekcha juftliklarni toping")}</p><div class="mem">${g.cs.map((c,i)=>`<button class="mc ${c.o||c.d?"on":""} ${c.d?"dn":""}" data-gc="${i}">${c.o||c.d?esc(c.x):"?"}</button>`).join("")}</div></div>`}
+ if(g.k==="spd"){const q=g.q;el.innerHTML=hdr("⚡ "+t("Tez javob"),`${t("Ball")}: ${g.sc}`)+`<div class="lb2"><div class="tbar"><i id="tl" style="width:${g.tl/60*100}%"></i></div><p class="m" id="tn">⏱ ${g.tl}</p><div class="lw">${esc(q.w.en)}</div>${q.o.map(o=>`<button class="opt" data-gs="${esc(o)}">${esc(o)}</button>`).join("")}</div>`}
+ if(g.k==="scr"){el.innerHTML=hdr("🔤 "+t("Harflar"),`${g.i+1}/${g.ws.length}`)+`<div class="lb2"><p class="m">${t("Harflardan soʻzni tuzing")}</p><div class="lw">${esc(g.w.uz)}</div><div class="slots">${g.w.en.split("").map((_,i)=>`<span>${g.pk[i]!==undefined?g.tiles[g.pk[i]]:""}</span>`).join("")}</div><div class="tiles">${g.tiles.map((c,i)=>`<button class="tile" data-gt="${i}" ${g.pk.includes(i)?"disabled":""}>${c}</button>`).join("")}</div><button class="chip" id="gu">⌫ ${t("Oʻchirish")}</button></div>`}
+ if(g.k==="hang"){const w=g.w.en,m=w.split("").map(c=>g.gs.has(c)||g.st?c:"_").join(" "),done=!w.split("").some(c=>!g.gs.has(c));
+  el.innerHTML=hdr("🪢 "+t("Soʻzni toping"),"❤ "+g.lv)+`<div class="lb2"><p class="m">${t("Maʼnosi")}:</p><div class="lw" style="font-size:1.5rem">${esc(g.w.uz)}</div><div class="hm">${m}</div>${g.st?`<p class="${g.st===1?"gd2":"bd2"}">${g.st===1?t("✅ Toʻgʻri!"):t("❌ Toʻgʻri javob:")+" "+esc(w)}</p><button class="bt" id="hnx">${t("Keyingisi")}</button>`:`<div class="kb">${"abcdefghijklmnopqrstuvwxyz".split("").map(c=>`<button data-gh="${c}" ${g.gs.has(c)?"disabled":""}>${c}</button>`).join("")}</div>`}</div>`;
+  if(!g.st&&done){g.st=1;g.sc++;addXP(3);boom();gRender()}}}
+function gClick(d,id){const g=S.g;if(!g)return;
+ if(d.gc!==undefined&&g.k==="mem"){const c=g.cs[+d.gc];if(c.o||c.d||g.sel.length>=2)return;c.o=1;g.sel.push(+d.gc);
+  if(g.sel.length===2){g.mv++;const[a,b]=g.sel.map(i=>g.cs[i]);if(a.p===b.p){a.d=b.d=1;g.sel=[];g.left--;if(!g.left){addXP(8);boom();gRender();setTimeout(()=>{$("#ls").innerHTML=`<div class="lb2"><div class="end"><div class="done">🧠</div><h1>${t("Ajoyib!")}</h1><div class="two"><div><b>${g.mv}</b>${t("Yurishlar")}</div><div><b>⚡ 8</b>XP</div></div></div></div><div class="lf"><button class="bt" data-gm="mem">${t("Qayta oʻynash")}</button><button class="bt ghost" id="gx">${t("Yopish")}</button></div>`;g.end=1},700);return}}
+   else setTimeout(()=>{a.o=0;b.o=0;g.sel=[];gRender()},800)}gRender()}
+ else if(d.gs!==undefined&&g.k==="spd"){if(d.gs===g.q.w.uz){g.sc++;try{navigator.vibrate(10)}catch(e){}}else g.tl=Math.max(1,g.tl-3);nextSpd();gRender()}
+ else if(d.gt!==undefined&&g.k==="scr"){g.pk.push(+d.gt);if(g.pk.length===g.w.en.length){const w=g.pk.map(i=>g.tiles[i]).join("");gRender();if(w===g.w.en){g.sc++;boom();setTimeout(()=>{g.i++;scrNext();gRender()},650)}else{toast(t("Notoʻgʻri, qayta urining"));setTimeout(()=>{g.pk=[];gRender()},500)}}else gRender()}
+ else if(id==="gu"&&g.k==="scr"){g.pk.pop();gRender()}
+ else if(d.gh!==undefined&&g.k==="hang"){g.gs.add(d.gh);if(!g.w.en.includes(d.gh)){g.lv--;if(!g.lv)g.st=2}gRender()}
+ else if(id==="hnx"){hangNext();gRender()}}
+
+/* ---------- views ---------- */
+function vHome(){const n=Math.floor(Date.now()/864e5),pl=pool(),w=pl[n%pl.length],m=MOT[n%MOT.length],g=Math.min(Math.round(tx()/GL*100),100),nx=LVS[LI(L)+1];
+ const last=LS("w3exr",null);
+ return `<div class="hero"><div class="gr"><div class="gav">${avc()}</div><div><b>${greet()}, ${esc(NM||U)}!</b><small>${L} · ${t(LVN[L])}</small></div><span class="chp">🔥 ${streak()}</span></div>
+ <div class="goal"><div class="ring" style="--p:${g}"><b>${Math.min(tx(),GL)}/${GL}</b></div><div><div class="gt">${t("Bugungi maqsad")}</div><div class="gs">⚡ ${X.t} XP ${t("jami")}</div></div></div></div>
+ <button class="wod" data-o="${esc(w.en)}"><small>${t("Kun soʻzi")} · ${w.l}</small><div class="wt">${esc(w.en)} <span data-s="${esc(w.en)}" class="wsp">🔊</span></div><div class="wm2">${esc(w.uz)}</div></button>
+ <div class="mot card"><small>${t("Kun motivatsiyasi")}</small><div class="me">“${m[0]}”</div><div class="m">${LANG==="en"?"":m[1]}</div></div>
+ <h3 class="sh">${t("Mashq qilish")}</h3>
+ <div class="qa"><button data-pr="mix"><span>🎯</span>${t("Mashq")}</button><button data-pr="listen"><span>🎧</span>${t("Eshitib topish")}</button><button data-v="games"><span>🎮</span>${t("Oʻyinlar")}</button><button data-ai="tr"><span>🌐</span>${t("Tarjimon")}</button></div>
+ <div class="lvc card"><div class="lvl"><span class="lb l${L}" style="margin:0">${L}</span>${nx?` → <span class="lb l${nx}" style="margin:0">${nx}</span>`:""}</div>
+  <b>${nx?t("Keyingi darajaga oʻtish"):t("Siz eng yuqori darajadasiz!")}</b><p class="m">${nx?t("10 ta savolning kamida 8 tasiga toʻgʻri javob bering."):""}</p>${nx?`<button class="bt" data-pr="exam" style="max-width:none">${t("Daraja imtihoni")}</button>`:""}${last?`<p class="m" style="margin:8px 0 0">${t("Oxirgi natija")}: ${last}%</p>`:""}</div>
+ ${rec.length?`<h3 class="sh">${t("Yaqinda koʻrilgan")}</h3><div class="hs">${rec.map(x=>`<button class="chip" data-o="${esc(x)}">${esc(x)}</button>`).join("")}</div>`:""}
+ <div class="ad">${t("Reklama uchun joy")}</div>`}
+
+function hl(x,q){if(!q)return x;try{return x.replace(new RegExp(q.split("").map(c=>c.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("[ʻʼ’'`‘]?"),"i"),m=>`<mark>${m}</mark>`)}catch(e){return x}}
+const hd=w=>S.dir==="en"?w.en:w.uz,bd=w=>S.dir==="en"?w.uz:w.en;
+function rowHTML(w,i,q){return `<li style="animation-delay:${Math.min(i,10)*30}ms"><button class="it" data-o="${esc(w.en)}"><div class="tt">${hl(esc(hd(w)),q||"")}<span class="lb l${w.l}">${w.l}</span><span class="p">${t(POS[w.p]||"")}</span></div><div class="m">${esc(bd(w))}</div></button><button class="ib" data-s="${esc(w.en)}" aria-label="${t("Tinglash")}">🔊</button><button class="ib ${fav.has(w.en)?"on":""}" data-f="${esc(w.en)}" aria-pressed="${fav.has(w.en)}" aria-label="${t("Yoqtirish")}">${fav.has(w.en)?"♥":"♡"}</button></li>`}
+function vDict(){return `<h2 class="hh">${t("Lugʻat")}</h2><input class="inp" id="q" type="search" autocomplete="off" autocapitalize="none" aria-label="${t("Qidirish")}" value="${esc(S.q)}">
+ <div class="swx"><div class="lp" id="pa"></div><button class="swb" id="sw" aria-label="${t("Yoʻnalishni almashtirish")}">⇄</button><div class="lp" id="pb"></div><span class="cnt" id="cn"></span></div>
+ <div class="chips nw1" id="lc"></div>
+ <button class="aib" id="gen">✨ ${t("AI bilan lugʻatni kengaytirish")}</button>
+ ${S.gen?`<div class="aic"><p class="m" style="margin-top:0">${t("Mavzuni tanlang: AI 25 ta yangi soʻz qoʻshadi")} (${L}).</p><div class="chips">${TOP.map((x,i)=>`<button class="chip" data-gen="${i}">${t(x)}</button>`).join("")}</div><div id="gres"></div></div>`:""}
+ <div id="rl"></div>`}
+function setSw(){const e=S.dir==="en",a=e?["EN","Inglizcha"]:["UZ","Oʻzbekcha"],b=e?["UZ","Oʻzbekcha"]:["EN","Inglizcha"];
+ $("#pa").innerHTML=`<b>${a[0]}</b><small>${t(a[1])}</small>`;$("#pb").innerHTML=`<b>${b[0]}</b><small>${t(b[1])}</small>`;$("#q").placeholder=t(e?"Inglizcha soʻz yozing…":"Oʻzbekcha soʻz yozing…")}
+function lc(){$("#lc").innerHTML=["all","fav",...LVS].map(x=>`<button class="chip ${S.lv===x?"on":""}" data-lf="${x}" style="flex:none">${x==="all"?t("Hammasi"):x==="fav"?"♥ "+t("Sevimli"):x}</button>`).join("")}
+function paintList(){const q=norm(S.q.trim()),en=S.dir==="en",lim=S.lim,src=dsort(),kf=en?"k1":"k2";
+ const ok=w=>S.lv==="all"||(S.lv==="fav"?fav.has(w.en):w.l===S.lv),pre=[],inc=[];let more=false;
+ for(let i=0;i<src.length;i++){const w=src[i];if(!ok(w))continue;
+  if(!q){if(pre.length>=lim){more=true;break}pre.push(w);continue}
+  const k=w[kf].indexOf(q);if(k===0){if(pre.length<lim)pre.push(w);else more=true}else if(k>0){if(inc.length<lim)inc.push(w);else more=true}
+  if(pre.length>=lim&&inc.length>=lim)break}
+ const r=pre.concat(inc).slice(0,lim);$("#cn").textContent=r.length+(more?"+":"")+" "+t("ta");let ai="";
+ if(q.length>=2){const a=S.aw&&S.aw.q===q?S.aw:null;ai=`<button class="aib" id="aiw">✨ “${esc(S.q.trim())}” ${t("ni WORDIFY AI dan soʻrash")}</button>`;
+  if(a&&a.busy)ai+=`<div class="aic"><i class="spn"></i> ${t("AI qidiryapti…")}</div>`;
+  else if(a&&a.err)ai+=`<div class="aic">${aiErr(a.e)}</div>`;
+  else if(a&&a.r){const x=a.r,lv=LVS.includes(x.level)?x.level:"B1";ai+=`<div class="aic"><div class="tt">${esc(x.en)}<span class="lb l${lv}">${lv}</span></div><div class="uzb">${esc(x.uz)}</div><div class="m"><i>${esc(x.ex)}</i><br>${esc(x.exUz)}</div><div class="acts" style="margin-top:10px"><button data-s="${esc(x.en)}">🔊</button><button id="aisv">♡ ${t("Lugʻatga qoʻshish")}</button></div></div>`}}
+ $("#rl").innerHTML=ai+(r.length?`<ul>${r.map((w,i)=>rowHTML(w,i,q)).join("")}</ul>${more?`<button class="bt alt" id="more" style="max-width:none">${t("Yana koʻrsatish")}</button>`:""}`:`<div class="empty">🔍<br>${t(S.lv==="fav"?"Hali sevimli soʻz yoʻq.":"Lugʻatda topilmadi.")}</div>`)}
+async function aiWord(){const q=S.q.trim(),k=norm(q);S.aw={q:k,busy:1};paintList();
+ try{const r=await ask(`You are a bilingual English-Uzbek dictionary. Return ONLY JSON: {"en":"English word or phrase, lowercase","uz":"Uzbek translation in Latin script (use ʻ in oʻ and gʻ)","pos":"one of n,v,adj,adv,i,ph,num","level":"CEFR level A1-C2","ex":"short English example sentence","exUz":"Uzbek translation of the example"}. The word to define (English or Uzbek): ${JSON.stringify(q)}`,true);S.aw={q:k,r}}catch(e){S.aw={q:k,err:1,e}}
+ if(S.v==="dict")paintList()}
+async function aiGen(i){const o=$("#gres");if(!o)return;o.innerHTML=`<div class="m"><i class="spn"></i> ${t("AI soʻz tayyorlayapti…")}</div>`;
+ try{const r=await ask(`Create 25 useful English words about the topic "${TOP[i]}" for Uzbek-speaking learners at CEFR level ${L} (single words or short phrases). Return ONLY JSON: {"words":[{"en":"lowercase English","uz":"Uzbek translation in Latin script (use ʻ in oʻ and gʻ)","pos":"n|v|adj|adv|i|ph|num","level":"${L}","ex":"short English example","exUz":"Uzbek translation of the example"}]}`,true);
+  const n=await addMany((r.words||[]).map(w=>[w.en,w.uz,w.pos,w.level||L,w.ex,w.exUz]));o.innerHTML=`<div class="m">${n?`✅ ${n} ${t("ta yangi soʻz qoʻshildi")}`:t("Yangi soʻz topilmadi")}</div>`;if(n)paintList()}
+ catch(e){o.innerHTML=`<div class="m">${aiErr(e)}</div>`}}
+function openW(en){const w=D.find(x=>x.en===en);if(!w)return;rec=[en,...rec.filter(x=>x!==en)].slice(0,8);SV("w3r",rec);
+ $("#box").innerHTML=`<div class="big">${esc(w.en)}<span class="lb l${w.l}">${w.l}</span></div><div class="m">${t(POS[w.p]||"")}</div><div class="uz">${esc(w.uz)}</div>${w.x?`<p class="m"><i>${esc(w.x)}</i><br>${esc(w.xu)}</p>`:""}<div class="acts"><button data-s="${esc(w.en)}">🔊 ${t("Tinglash")}</button><button data-f="${esc(w.en)}">${fav.has(w.en)?"♥":"♡"} ${t("Sevimli")}</button><button id="cl">${t("Yopish")}</button></div>`;$("#sheet").classList.add("on")}
+
+function vAI(){const k=S.am,hist=S.msgs[k]||[];
+ const head=`<div class="aih"><div class="sp2">✨</div><h1>WORDIFY AI</h1><small>${t("bilan ingliz tili yanada oson")}</small></div>
+ <div class="ams">${[["chat","💬 "+t("Suhbat")],["role","🎭 "+t("Rolli oʻyin")],["fix","✍️ "+t("Tekshirish")],["tr","🌐 "+t("Tarjima")]].map(a=>`<button data-am="${a[0]}" class="${k===a[0]?"on":""}">${a[1]}</button>`).join("")}</div>`;
+ const bub=h=>h.map((m,i)=>`<div class="bb ${m.role==="user"?"u":"a"}">${esc(m.content)}${m.role!=="user"?`<button class="sx" data-sx="${k}:${i}" aria-label="${t("Tinglash")}">🔊</button>`:""}</div>`).join("");
+ const inp=`<div class="inrow"><button class="mic" id="mic" aria-label="${t("Ovoz bilan")}">🎤</button><input class="inp" id="ain" placeholder="${t("Savolingizni yozing…")}" autocomplete="off"><button class="snd" id="aisd" aria-label="${t("Yuborish")}">➤</button></div>`;
+ if(k==="chat")return head+(hist.length?`<div id="cb">${bub(hist)}</div>`:`<p class="m">${t("Soʻz maʼnosi, grammatika yoki misol haqida soʻrang.")}</p><div class="chips">${["“ambiguous” nima degani?","Present Perfect ni oddiy tushuntir","Menga 5 ta soʻz va gap ber","Ish suhbati uchun 3 ta ibora"].map(x=>`<button class="chip" data-aq="${esc(x)}">${esc(t(x))}</button>`).join("")}</div>`)+inp;
+ if(k==="role")return head+(S.scn?`<div class="m">${S.scn[0]} ${t(S.scn[1])} <button class="chip" id="scx" style="margin-left:6px">${t("Boshqa")}</button></div><div id="cb">${bub(hist)}</div>`+inp:`<p class="m">${t("Vaziyatni tanlang. AI roli oʻynaydi, siz inglizcha javob berasiz.")}</p><div class="scn">${SCN.map((s,i)=>`<button data-sc="${i}"><span>${s[0]}</span>${t(s[1])}</button>`).join("")}</div>`);
+ if(k==="fix")return head+`<p class="m">${t("Inglizcha gap yozing, AI xatolarini tushuntiradi.")}</p><textarea class="ta" id="fx" rows="4" placeholder="I goed to school yesterday…"></textarea><button class="bt" id="fxgo" style="max-width:none">${t("Tekshirish")}</button><div id="fxo"></div>`;
+ return head+`<div class="swx"><div class="lp" id="tpa"></div><button class="swb" id="trsw" aria-label="${t("Yoʻnalishni almashtirish")}">⇄</button><div class="lp" id="tpb"></div></div><textarea class="ta" id="tt" rows="4" placeholder="${t("Gap yoki matn yozing…")}"></textarea><button class="bt" id="trgo" style="max-width:none">${t("Tarjima qilish")}</button><div id="to"></div>`}
+function setTr(){const e=S.td==="en",a=e?["EN","Inglizcha"]:["UZ","Oʻzbekcha"],b=e?["UZ","Oʻzbekcha"]:["EN","Inglizcha"];$("#tpa").innerHTML=`<b>${a[0]}</b><small>${t(a[1])}</small>`;$("#tpb").innerHTML=`<b>${b[0]}</b><small>${t(b[1])}</small>`}
+async function aiSend(x){x=(x||"").trim();const k=S.am;if(!x)return;S.msgs[k].push({role:"user",content:x});render();
+ $("#cb").insertAdjacentHTML("beforeend",`<div class="bb a"><i class="spn"></i></div>`);scrollTo(0,document.body.scrollHeight);await aiReply(k)}
+async function aiReply(k){const hist=S.msgs[k];let msgs=hist.slice(-10).map(m=>({role:m.role,content:m.content}));
+ if(!msgs.length||msgs[0].role!=="user")msgs.unshift({role:"user",content:"Start the role-play now with your first line."});
+ msgs[0]={role:"user",content:(k==="role"?ROLE(S.scn[2]):AIS())+"\n\n"+msgs[0].content};
+ try{const s=await sm();if(!s)throw{code:"na"};const r=await s(msgs,{cache:false});hist.push({role:"assistant",content:r.text.trim()})}catch(e){hist.push({role:"assistant",content:aiErr(e)})}
+ if(S.v==="ai"&&S.am===k){render();scrollTo(0,document.body.scrollHeight)}}
+async function aiFix(){const x=$("#fx").value.trim();if(!x)return;const o=$("#fxo"),b=$("#fxgo");b.disabled=true;o.innerHTML=`<div class="res"><i class="spn"></i> ${t("Tekshirilmoqda…")}</div>`;
+ try{const r=await ask(`You are an English teacher for Uzbek speakers (learner level ${L||"A1"}). Check the text. Return ONLY JSON: {"corrected":"corrected text","score":0-100,"notes":["short explanation of each mistake in ${LANG==="en"?"simple English":"Uzbek (Latin)"}"]}. Text: ${JSON.stringify(x)}`,true);
+  o.innerHTML=`<div class="res"><div class="sc">${esc(r.score)}/100</div><div class="m">${t("Toʻgʻri variant:")}</div><div class="fx">${esc(r.corrected)}</div><button class="sp" data-s="${esc(r.corrected)}" aria-label="${t("Tinglash")}">🔊</button>${(r.notes||[]).map(n=>`<p>• ${esc(n)}</p>`).join("")}</div>`}
+ catch(e){o.innerHTML=`<div class="res">${aiErr(e)}</div>`}b.disabled=false}
+async function doTr(){const x=$("#tt").value.trim();if(!x)return;const o=$("#to"),b=$("#trgo");b.disabled=true;o.innerHTML=`<div class="res"><i class="spn"></i> ${t("Tarjima qilinmoqda…")}</div>`;
+ try{const r=(await ask(`Translate the text between the markers ${S.td==="en"?"from English to Uzbek (Latin script, use ʻ in oʻ and gʻ)":"from Uzbek (Latin script) to English"}. Reply with the translation only.\n<<<\n${x}\n>>>`)).trim();S.tres=r;
+  o.innerHTML=`<div class="res"><div class="fx">${esc(r)}</div><div class="acts">${S.td==="uz"?`<button id="trspk">🔊</button>`:""}<button id="trcp">📋 ${t("Nusxa")}</button></div></div>`}catch(e){o.innerHTML=`<div class="res">${aiErr(e)}</div>`}b.disabled=false}
+function mic(){const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){toast(t("Bu brauzerda ovoz kiritish yoʻq"));return}
+ const r=new R();r.lang="en-US";r.onresult=e=>{$("#ain").value=e.results[0][0].transcript};r.onerror=()=>toast(t("Ovoz eshitilmadi"));try{r.start();toast(t("Gapiring…"))}catch(x){}}
+
+function vGames(){const G=[["mem","🧠","Xotira","Juftliklarni toping"],["spd","⚡","Tez javob","60 soniyada koʻproq javob"],["scr","🔤","Harflar","Aralash harflardan soʻz tuzing"],["hang","🪢","Soʻzni toping","Harflarni taxmin qiling"]];
+ return `<h2 class="hh">${t("Oʻyinlar")}</h2><p class="m">${t("Zerikkanda oʻynang va soʻz oʻrganing!")} · 🏅 ${t("Rekord")}: ${BEST}</p>
+ <div class="gms">${G.map(g=>`<button class="card gcard" data-gm="${g[0]}"><span>${g[1]}</span><div><b>${t(g[2])}</b><small>${t(g[3])}</small></div></button>`).join("")}</div><div class="ad">${t("Reklama uchun joy")}</div>`}
+function vMe(){const days=[];for(let i=6;i>=0;i--){const d=ymd(i);days.push([d,X.d[d]||0])}const mx=Math.max(20,...days.map(x=>x[1])),wd=["Yak","Dush","Sesh","Chor","Pay","Jum","Shan"];
+ const B=[["🔥","3 kunlik seriya",streak()>=3],["🏆","7 kunlik seriya",streak()>=7],["⚡","500 XP",X.t>=500],["🎯","A2 darajaga chiqdi",LI(L)>=1],["🎓","B1 darajaga chiqdi",LI(L)>=2],["✨","Lugʻat kengaytirildi",EXTRA.length>0]];
+ return `<button class="av" data-pic="1" aria-label="${t("Rasm tanlash")}">${avc()}<span class="cam">📷</span></button><div class="un">${esc(NM||U)}</div><div class="ph">@${esc(U)}${PH?" · +998 "+PH.slice(0,2)+" *** ** "+PH.slice(7):""}</div>
+ <div class="st4"><div><b>⚡ ${X.t}</b><small>XP</small></div><div><b>🔥 ${streak()}</b><small>${t("Kunlik seriya")}</small></div><div><b>📖 ${D.length}</b><small>${t("Lugʻatda soʻz")}</small></div><div><b>♥ ${fav.size}</b><small>${t("Sevimli soʻz")}</small></div></div>
+ <h3 class="sh">${t("Mening darajam")}: ${L} — ${t(LVN[L])}</h3><div class="chips">${LVS.map(x=>`<button class="chip ${L===x?"on":""}" data-lv="${x}">${x}</button>`).join("")}</div>
+ <h3 class="sh">${t("Til")}</h3><div class="chips"><button class="chip ${LANG==="uz"?"on":""}" data-lg="uz">Oʻzbekcha</button><button class="chip ${LANG==="en"?"on":""}" data-lg="en">English</button></div>
+ <h3 class="sh">${t("Kunlik maqsad")}</h3><div class="chips">${[[20,"Yengil · 20 XP"],[40,"Oʻrta · 40 XP"],[60,"Qattiq · 60 XP"]].map(x=>`<button class="chip ${GL===x[0]?"on":""}" data-gl="${x[0]}">${t(x[1])}</button>`).join("")}</div>
+ <h3 class="sh">${t("Haftalik XP")}</h3><div class="bars">${days.map(([d,v])=>`<div><i style="height:${v/mx*100}%"></i><small>${wd[new Date(d).getUTCDay()]}</small></div>`).join("")}</div>
+ <h3 class="sh">${t("Yutuqlar")}</h3><div class="bd">${B.map(b=>`<div class="${b[2]?"":"off"}"><span>${b[0]}</span><small>${t(b[1])}</small></div>`).join("")}</div>
+ <h3 class="sh">${t("Lugʻatni import qilish")}</h3><p class="m">${t("CSV, TXT yoki JSON fayl: har qatorda inglizcha, oʻzbekcha, turkum, daraja.")}</p>
+ <button class="bt alt" id="imp" style="max-width:none">📥 ${t("Fayldan yuklash")}</button>${EXTRA.length?`<button class="bt ghost" id="impx" style="max-width:none">${t("Qoʻshilgan soʻzlarni oʻchirish")} (${EXTRA.length})</button>`:""}
+ <button class="bt" id="rn" style="max-width:none;margin-top:18px">${t("Profilni tahrirlash")}</button><button class="bt alt" id="shr" style="max-width:none">${t("Doʻstga ulashish")}</button><button class="bt ghost" id="rs" style="max-width:none">${t("Natijalarni tozalash")}</button><button class="bt alt" id="so" style="max-width:none">${t("Chiqish")}</button>`}
+function render(){const V={home:vHome,dict:vDict,ai:vAI,games:vGames,me:vMe};$("#app").innerHTML=V[S.v]();
+ document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===S.v));
+ if(S.v==="dict"){setSw();lc();paintList()}if(S.v==="ai"&&S.am==="tr")setTr()}
+
+/* ---------- onboarding ---------- */
+const OB={mode:"reg",name:"",email:"",ph:"",un:"",av:"🦊",pu:[],gl:40};
+const fmtPh=d=>{d=d.replace(/\D/g,"").slice(0,9);return [d.slice(0,2),d.slice(2,5),d.slice(5,7),d.slice(7,9)].filter(Boolean).join(" ")};
+async function sha(s){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return btoa(unescape(encodeURIComponent(s)))}}
+function ob(i){ob.cur=i;const el=$("#ob");el.hidden=false;$("#nav").hidden=true;const edit=!!(U&&L),reg=OB.mode==="reg";
+ let m="",b=`<button class="bt" data-ob="${i+1}">${t("Keyingisi")}</button>`;
+ if(i===0)m=`<svg><use href="#lg"/></svg><h1>${t("Assalomu alaykum!")}</h1><p>${t("WORDIFY ga xush kelibsiz — ingliz tilini oʻzbek tilida, oson va qiziqarli oʻrganing. Mashqlar, oʻyinlar, lugʻat va WORDIFY AI repetitor bir joyda.")}</p>`;
+ if(i===1)m=`<h1>${t("Nima uchun oʻrganyapsiz?")}</h1><p>${t("Bir nechtasini tanlashingiz mumkin.")}</p><div class="chips">${PUR.map(x=>`<button class="chip ${OB.pu.includes(x)?"on":""}" data-pu="${x}">${t(x)}</button>`).join("")}</div><h3 class="sh">${t("Kunlik maqsad")}</h3><div class="chips">${[[20,"Yengil · 20 XP"],[40,"Oʻrta · 40 XP"],[60,"Qattiq · 60 XP"]].map(x=>`<button class="chip ${OB.gl===x[0]?"on":""}" data-gob="${x[0]}">${t(x[1])}</button>`).join("")}</div>`;
+ if(i===2){m=`<h1>${t("Inglizcha darajangiz?")}</h1><p>${t("Bilmasangiz, A1 ni tanlang. Keyin imtihon bilan yuqoriga chiqasiz.")}</p><div class="lvg">${LVS.map(x=>`<button class="lvb ${L===x?"on":""}" data-lvo="${x}"><b>${x}</b><small>${t(LVN[x])}</small></button>`).join("")}</div>`;
+  if(L&&LI(L)>=2)m+=`<div class="card" style="margin-top:14px"><b>Ilovani inglizcha qilaymi?</b><div class="m">Do you want the app in English?</div><div class="chips" style="margin:10px 0 0"><button class="chip ${LANG==="uz"?"on":""}" data-lg="uz">Oʻzbekcha</button><button class="chip ${LANG==="en"?"on":""}" data-lg="en">English</button></div></div>`;
+  b=`<button class="bt" data-ob="3" ${L?"":"disabled"}>${t("Keyingisi")}</button>`}
+ if(i===3){m=`<h1>${t(reg?"Roʻyxatdan oʻting":"Hisobingizga kiring")}</h1><div class="seg"><button data-rm="reg" class="${reg?"on":""}">${t("Roʻyxatdan oʻtish")}</button><button data-rm="login" class="${reg?"":"on"}">${t("Kirish")}</button></div>
+ <button class="bt alt" data-auth="google">🟢 ${t("Google bilan davom etish")}</button><button class="bt alt" data-auth="apple">🍎 ${t("Apple bilan davom etish")}</button><div class="or"><span>${t("yoki email bilan")}</span></div>
+ ${reg?`<input class="inp" id="rnm" placeholder="${t("Ismingiz")}" autocomplete="name" value="${esc(OB.name)}" style="margin-bottom:10px">`:""}<input class="inp" id="re" type="email" placeholder="${t("Email manzil")}" autocomplete="email" value="${esc(OB.email)}" style="margin-bottom:10px">
+ <div class="pw"><input class="inp" id="rp" type="password" placeholder="${t("Parol (kamida 6 ta belgi)")}"><button id="eye" type="button" aria-label="${t("Parolni koʻrsatish")}">👁</button></div>
+ ${reg?`<label class="ck"><input type="checkbox" id="rt"> ${t("Foydalanish shartlari va maxfiylik siyosatiga roziman")}</label>`:""}<div class="err" id="er"></div>`;b=`<button class="bt" id="rg">${t("Davom etish")}</button>`}
+ if(i===4){m=`<h1>${t("Telefon raqamingiz")}</h1><p>${t("Telefon raqamingizni kiriting. U sizning hisobingiz bilan bogʻlanadi.")}</p><div class="phr"><div class="cc">🇺🇿 +998</div><input class="inp" id="phn" inputmode="numeric" placeholder="90 123 45 67" value="${fmtPh(OB.ph)}"></div><div class="err" id="er"></div>`;b=`<button class="bt" id="phs">${t("Davom etish")}</button>`}
+ if(i===5){if(edit)OB.av=AV||OB.av;m=`<h1>${t(edit?"Profilni tahrirlash":"Profilingiz")}</h1><p>${t("Rasm tanlang yoki avatar qoʻying, foydalanuvchi nomini kiriting (lotin harflari, raqam, _).")}</p>
+ <div class="pic"><div class="av" style="margin:0">${avc()}</div><button class="bt alt" data-pic="1" style="margin:0;flex:1">📷 ${t("Galereyadan tanlash")}</button></div>
+ <div class="avg">${AVS.map(a=>`<button data-av="${a}" class="${!AVI&&OB.av===a?"on":""}">${a}</button>`).join("")}</div><input class="inp" id="unm" maxlength="20" autocomplete="off" autocapitalize="none" placeholder="${t("masalan")}: aziza_01" value="${esc(edit?U:OB.un)}"><div class="err" id="er"></div>`;
+  b=edit?`<button class="bt" id="pfs">${t("Saqlash")}</button><button class="bt ghost" id="cx">${t("Bekor qilish")}</button>`:`<button class="bt" id="pfn">${t("Keyingisi")}</button>`}
+ if(i===6){m=`<div class="done">🎉</div><h1 style="text-align:center">${t("Tayyor")}, ${esc(OB.name||OB.un)}!</h1><p style="text-align:center">${t("Daraja")}: ${L} · ${t("Maqsad")}: ${OB.gl} XP</p><p style="text-align:center">${t("Birinchi mashqingiz sizni kutyapti.")}</p>`;b=`<button class="bt" id="fin">${t("WORDIFY ni boshlash")}</button>`}
+ const bar=i>0&&!(i===5&&edit)?`<div class="obt"><button class="bk" data-ob="${i-1}" aria-label="${t("Orqaga")}">←</button><div class="pb2"><i style="width:${i/6*100}%"></i></div></div>`:"";
+ el.innerHTML=`${bar}<div class="obm ${i===0||i===6?"c":""}">${m}</div>${b}`;el.scrollTop=0;
+ if([3,4,5].includes(i))setTimeout(()=>{const x=$("#rnm")||$("#phn")||$("#unm");x&&x.focus()},60)}
+function enter(){$("#ob").hidden=true;$("#nav").hidden=false;S.v="home";buildNav();render();scrollTo(0,0)}
+async function doReg(){const reg=OB.mode==="reg",e=$("#re").value.trim().toLowerCase(),p=$("#rp").value,er=$("#er");
+ if(reg){const n=$("#rnm").value.trim();if(n.length<2){er.textContent=t("Ismingizni yozing");return}OB.name=n}
+ if(!/^\S+@\S+\.\S+$/.test(e)){er.textContent=t("Email manzilni toʻgʻri yozing");return}
+ if(p.length<6){er.textContent=t("Parol kamida 6 ta belgidan iborat boʻlsin");return}
+ if(reg&&!$("#rt").checked){er.textContent=t("Davom etish uchun shartlarga rozilik bering");return}
+ const h=await sha(p),acc=LS("w3acc",null);
+ if(reg)SV("w3acc",{e,h});else if(!acc||acc.e!==e||acc.h!==h){er.textContent=t(acc?"Email yoki parol notoʻgʻri":"Bu qurilmada hisob topilmadi. Roʻyxatdan oʻting.");return}
+ OB.email=e;ob(4)}
+function saveProfile(edit){const v=$("#unm").value.trim(),er=$("#er");if(!/^[A-Za-z0-9_]{3,20}$/.test(v)){er.textContent=t("3–20 ta belgi: harf, raqam yoki _");return}
+ OB.un=v;if(edit){U=v;SV("w3u",U);AV=OB.av;SV("w3a",AV);enter()}else ob(6)}
+function fin(){U=OB.un;SV("w3u",U);SV("w3l",L);NM=OB.name||U;SV("w3n",NM);AV=OB.av;SV("w3a",AV);PH=OB.ph;SV("w3ph",PH);GL=OB.gl;SV("w3g",GL);PU=OB.pu;SV("w3pu",PU);boom();setTimeout(enter,700)}
+function pickImg(f){if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=256;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,256,256);AVI=c.toDataURL("image/jpeg",.82);SV("w3img",AVI);if(!$("#ob").hidden)ob(5);else render();toast(t("Rasm qoʻyildi ✓"))};im.onerror=()=>toast(t("Rasm ochilmadi"));im.src=r.result};r.readAsDataURL(f)}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+ if(e.target.id==="sheet"){e.target.classList.remove("on");return}
+ const b=e.target.closest("button,.wsp");if(!b)return;const d=b.dataset,id=b.id;
+ if(!$("#ls").hidden&&S.g&&(d.gc!==undefined||d.gs!==undefined||d.gt!==undefined||d.gh!==undefined||id==="gu"||id==="hnx")){gClick(d,id);return}
+ if(d.v){closeOv();S.v=d.v;render();scrollTo(0,0);try{navigator.vibrate(8)}catch(x){}anim($("#app"),[{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:260})}
+ else if(d.ob!==undefined)ob(+d.ob);
+ else if(d.rm){OB.mode=d.rm;ob(3)}
+ else if(d.auth){b.disabled=true;b.innerHTML='<i class="spn"></i> '+t("Ulanmoqda…");setTimeout(()=>ob(4),900)}
+ else if(id==="eye"){const p=$("#rp");p.type=p.type==="password"?"text":"password"}
+ else if(id==="rg")doReg();
+ else if(id==="phs"){const v=$("#phn").value.replace(/\D/g,"");if(v.length!==9){$("#er").textContent=t("Raqam 9 ta raqamdan iborat boʻlsin (masalan, 90 123 45 67)");return}OB.ph=v;ob(5)}
+ else if(d.pic)$("#fimg").click();
+ else if(d.av){OB.av=d.av;AVI="";SV("w3img","");ob(5)}
+ else if(id==="pfs")saveProfile(true);else if(id==="pfn")saveProfile(false);
+ else if(id==="cx")enter();
+ else if(d.lvo){L=d.lvo;SV("w3l",L);ob(2)}
+ else if(d.lg){setLang(d.lg)}
+ else if(d.pu){const k=d.pu;OB.pu=OB.pu.includes(k)?OB.pu.filter(x=>x!==k):[...OB.pu,k];b.classList.toggle("on")}
+ else if(d.gob){OB.gl=+d.gob;ob(1)}
+ else if(id==="fin")fin();
+ else if(d.lv){L=d.lv;SV("w3l",L);render();if(LI(L)>=2&&LANG==="uz")askLang()}
+ else if(d.gl){GL=+d.gl;SV("w3g",GL);render()}
+ else if(d.pr){const k=d.pr;if(k==="exam")sess("exam",pool(),[0,2,1,3,0,2,1,3,0,2]);else if(k==="listen")sess("practice",pool(),[1]);else sess("practice",pool())}
+ else if(d.gm)gStart(d.gm);
+ else if(d.ai){S.v="ai";S.am=d.ai;render();scrollTo(0,0)}
+ else if(d.lo){const z=S.ls,q=z.qs[z.i];judge(d.lo===(q.t===2?q.w.en:q.w.uz),d.lo)}
+ else if(id==="lck"){const i=$("#lin"),v=norm(i.value.trim()).replace(/\s+/g," ");if(!v)return;i.disabled=true;judge(v===norm(S.ls.qs[S.ls.i].w.en),v)}
+ else if(id==="lnx"){S.ls.i++;showQ()}
+ else if(id==="lx"||id==="gx")closeOv();
+ else if(id==="lfin"){const up=S.ls&&S.ls.up;if(S.ls&&S.ls.kind==="exam")SV("w3exr",Math.round(S.ls.ok/S.ls.qs.length*100));closeOv();render();scrollTo(0,0);if(up&&LI(L)>=2&&LANG==="uz")askLang()}
+ else if(id==="again")sess("exam",pool(),[0,2,1,3,0,2,1,3,0,2]);
+ else if(d.s)speak(d.s);
+ else if(d.o)openW(d.o);
+ else if(d.f){const k=d.f;fav.has(k)?fav.delete(k):fav.add(k);SV("w3f",[...fav]);if(S.v==="dict")paintList();else render();if($("#sheet").classList.contains("on"))openW(k)}
+ else if(id==="cl")$("#sheet").classList.remove("on");
+ else if(d.lf){S.lv=d.lf;S.lim=100;lc();paintList()}
+ else if(id==="more"){S.lim+=100;paintList()}
+ else if(id==="sw"){S.dir=S.dir==="en"?"uz":"en";S.lim=100;anim(b,[{transform:"rotate(0)"},{transform:"rotate(180deg)"}],{duration:380,easing:"ease-in-out"});anim($("#pa"),[{transform:"translateX(34px)",opacity:0},{transform:"none",opacity:1}],{duration:320});anim($("#pb"),[{transform:"translateX(-34px)",opacity:0},{transform:"none",opacity:1}],{duration:320});setSw();paintList()}
+ else if(id==="aiw")aiWord();
+ else if(id==="gen"){S.gen=!S.gen;render()}
+ else if(d.gen!==undefined)aiGen(+d.gen);
+ else if(id==="aisv"&&S.aw&&S.aw.r){const x=S.aw.r;addMany([[x.en,x.uz,x.pos,LVS.includes(x.level)?x.level:"B1",x.ex,x.exUz]]).then(()=>{const en=String(x.en||"").toLowerCase().trim();fav.add(en);SV("w3f",[...fav]);toast(t("Lugʻatga qoʻshildi ✓"));paintList()})}
+ else if(d.am){S.am=d.am;render()}
+ else if(d.sc){S.scn=SCN[+d.sc];S.msgs.role=[];render();$("#cb").insertAdjacentHTML("beforeend",`<div class="bb a"><i class="spn"></i></div>`);aiReply("role")}
+ else if(id==="scx"){S.scn=null;S.msgs.role=[];render()}
+ else if(d.aq)aiSend(d.aq);
+ else if(d.sx){const[k,i]=d.sx.split(":"),m=S.msgs[k][+i];if(m)speak(m.content.split("Maslahat:")[0])}
+ else if(id==="aisd"){const i=$("#ain");const v=i.value;i.value="";aiSend(v)}
+ else if(id==="mic")mic();
+ else if(id==="fxgo")aiFix();
+ else if(id==="trsw"){S.td=S.td==="en"?"uz":"en";anim(b,[{transform:"rotate(0)"},{transform:"rotate(180deg)"}],{duration:380});anim($("#tpa"),[{transform:"translateX(34px)",opacity:0},{transform:"none",opacity:1}],{duration:320});anim($("#tpb"),[{transform:"translateX(-34px)",opacity:0},{transform:"none",opacity:1}],{duration:320});setTr()}
+ else if(id==="trgo")doTr();
+ else if(id==="trspk")speak(S.tres);
+ else if(id==="trcp"){try{navigator.clipboard.writeText(S.tres);toast(t("Nusxa olindi"))}catch(x){toast(t("Nusxa olib boʻlmadi"))}}
+ else if(id==="imp")$("#fdict").click();
+ else if(id==="impx"){idbSet("extra",[]).then(()=>location.reload())}
+ else if(id==="rn")ob(5);
+ else if(id==="shr"){const u=location.href;try{navigator.share?navigator.share({title:"WORDIFY",text:t("Ingliz tilini WORDIFY bilan oʻrganing!"),url:u}):(navigator.clipboard.writeText(u),toast(t("Havola nusxalandi")))}catch(x){}}
+ else if(id==="rs"){X={t:0,d:{}};ST={d:"",n:0};fav=new Set();SV("w3xp",X);SV("w3s",ST);SV("w3f",[]);toast(t("Tozalandi"));render()}
+ else if(id==="so"){U=L=null;try{["w3u","w3l"].forEach(k=>localStorage.removeItem(k))}catch(x){}ob(0)}
+});
+document.addEventListener("input",e=>{const x=e.target;if(x.id==="q"){S.q=x.value;S.lim=100;paintList()}else if(x.id==="phn")x.value=fmtPh(x.value)});
+document.addEventListener("change",e=>{if(e.target.id==="fimg"){pickImg(e.target.files[0]);e.target.value=""}else if(e.target.id==="fdict"){importFile(e.target.files[0]);e.target.value=""}});
+document.addEventListener("keydown",e=>{if(e.key!=="Enter")return;const id=e.target.id;
+ if(id==="re"||id==="rp"||id==="rnm")doReg();else if(id==="phn")$("#phs").click();else if(id==="unm")($("#pfs")||$("#pfn")).click();else if(id==="ain")$("#aisd").click();else if(id==="lin"&&$("#lck"))$("#lck").click()});
+
+/* ---------- start ---------- */
+const rows=[];
+RAW.split("\n").forEach((ln,i)=>ln.split(";").map(s=>s.trim()).filter(Boolean).forEach(s=>{const[en,uz,p]=s.split("|");rows.push([en,uz,p,LV0[i]||"A1"])}));
+(NEW+";"+MORE).split(";").map(s=>s.trim()).filter(Boolean).forEach(s=>{const[en,uz,p,l]=s.split("|");rows.push([en,uz,p,l])});
+rows.forEach(r=>{const w=mk(r[0],r[1],r[2],r[3]);if(w)D.push(w)});rebuild();
+buildNav();
+const calm=matchMedia("(prefers-reduced-motion:reduce)").matches;
+if(U&&L){$("#nav").hidden=false;render()}else ob(0);
+setTimeout(()=>$("#splash").classList.add("off"),calm?400:1700);
+idbGet("extra").then(async v=>{if(Array.isArray(v)&&v.length){let n=0;for(const r of v){const w=mk(r[0],r[1],r[2],r[3],r[4],r[5]);if(w){D.push(w);EXTRA.push(r);n++}}if(n){rebuild();if(U&&L&&!$("#nav").hidden&&S.v==="dict")paintList()}}});
+
+</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+</body>
+</html>
