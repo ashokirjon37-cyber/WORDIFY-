@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "WORDIFY",
+  "short_name": "WORDIFY",
+  "description": "Inglizcha–oʻzbekcha lugʻat va ingliz tilini oʻrganish ilovasi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "uz",
+  "background_color": "#ffffff",
+  "theme_color": "#0F2F6B",
+  "categories": ["education"],
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
